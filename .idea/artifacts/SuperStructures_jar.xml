@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact name="SuperStructures:jar">
+    <output-path>$PROJECT_DIR$/../../Game Files/StarMade Modded/StarMade/mods</output-path>
+    <root id="root">
+      <element id="archive" name="SuperStructures.jar">
+        <element id="module-output" name="SuperStructures" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/mod.json" />
+      </element>
+    </root>
+  </artifact>
+</component>
