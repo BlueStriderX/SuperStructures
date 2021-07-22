@@ -14,4 +14,11 @@ public class DysonSphereDefenseModuleData extends StructureModuleData {
     public DysonSphereDefenseModuleData(SuperStructureData structureData) {
         super("Dyson Sphere Defense Module", 5, 6, structureData);
     }
+
+    /* Todo: Display module status and info
+    @Override
+    public String getDesc() {
+
+
+     */
 }

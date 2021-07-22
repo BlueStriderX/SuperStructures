@@ -6,6 +6,7 @@ import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.common.data.world.StellarSystem;
+import org.schema.game.server.data.ServerConfig;
 import thederpgamer.superstructures.data.structures.DysonSphereData;
 import thederpgamer.superstructures.manager.ConfigManager;
 
@@ -19,7 +20,7 @@ public class DysonSphereUtils {
 
     public static boolean isValidForDysonSphere(SegmentPiece segmentPiece) {
         Sector sector = GameServer.getUniverse().getSector(segmentPiece.getSegmentController().getSectorId());
-        return (sector._getDistanceToSun() <= (ConfigManager.getMainConfig().getDouble("max-dyson-sphere-station-distance"))) && !hasDysonSphere(sector._getSystem()) && segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION);
+        return ((sector._getDistanceToSun() * (int) ServerConfig.SECTOR_SIZE.getCurrentState()) <= (ConfigManager.getMainConfig().getDouble("max-dyson-sphere-station-distance"))) && segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION);
     }
 
     public static boolean hasDysonSphere(StellarSystem system) {

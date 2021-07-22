@@ -48,6 +48,8 @@ public class DysonSphereModuleTypeSelectionDialog extends GUIInputDialog {
             ((DysonSphereModuleTypeSelectionPanel) getInputPanel()).index = index;
         }
         super.activate();
+        getState().getPlayerInputs().remove(this);
+        getState().getPlayerInputs().add(this);
     }
 
     @Override

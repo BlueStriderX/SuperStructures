@@ -37,7 +37,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private GUITilePane<StructureModuleData> modulePane;
 
     public DysonSphereMenuPanel(InputState inputState, SuperStructureData structureData) {
-        super(inputState, "DysonSphereMenuPanel", 800, 500);
+        super(inputState, "DysonSphereMenuPanel", 800, 250);
         this.structureData = structureData;
     }
 
@@ -68,7 +68,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     }
 
     private void createModuleTab(GUIContentPane moduleTab) {
-        modulePane = new GUITilePane<>(getState(), guiWindow, 132, 165);
+        modulePane = new GUITilePane<>(getState(), guiWindow, 132, 180);
         modulePane.onInit();
         for(int i = 0; i < structureData.modules.length; i ++) createModuleTile(modulePane, i);
         moduleTab.getContent(0).attach(modulePane);
@@ -85,6 +85,17 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             structureData.modules[index] = new DysonSphereEmptyModuleData(structureData);
             module[0] = structureData.modules[index];
         }
+
+        GUIHorizontalArea.HButtonColor buttonColor = GUIHorizontalArea.HButtonColor.BLUE;
+        String desc = module[0].getDesc();
+        if(module[0].status == StructureModuleData.CONSTRUCTION) {
+            buttonColor = GUIHorizontalArea.HButtonColor.YELLOW;
+            desc = "Constructing module";
+        } else if(module[0].status == StructureModuleData.UPGRADE) {
+            buttonColor = GUIHorizontalArea.HButtonColor.GREEN;
+            desc = "Upgrading module to level " + (module[0].level + 1);
+        }
+        else if(module[0].status == StructureModuleData.REPAIR) buttonColor = GUIHorizontalArea.HButtonColor.ORANGE;
 
         if(module[0] instanceof DysonSphereEmptyModuleData) {
             GUITile tile = modulePane.addButtonTile("EMPTY", "Add new module", GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
@@ -114,10 +125,9 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             spriteOverlay.getSprite().setHeight(115);
             tile.attach(spriteOverlay);
             spriteOverlay.getPos().x += 5;
-            spriteOverlay.getPos().y += 50;
+            spriteOverlay.getPos().y += 70;
         } else if(module[0] instanceof DysonSpherePowerModuleData) {
-            String desc = (module[0].level < module[0].maxLevel) ? ("Upgrade module to level " + (module[0].level + 1)) : "Max level reached";
-            GUITile tile = modulePane.addButtonTile("POWER", desc, GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
+            GUITile tile = modulePane.addButtonTile("POWER - " + module[0].level, desc, buttonColor, new GUICallback() {
                 @Override
                 public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                     if(mouseEvent.pressedLeftMouse()) {
@@ -126,8 +136,15 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                             queueModuleUpgrade(module[0], index);
                         } else {
                             getState().getController().queueUIAudio("0022_menu_ui - error 1");
-                            new SimplePopup(getState(), "Max level reached", "This module has already reached it's maximum level!");
+                            new SimplePopup(getState(), "Cannot Upgrade", "This module has already reached it's maximum level!");
                         }
+                    } else if(mouseEvent.pressedRightMouse()) {
+                        getState().getController().queueUIAudio("0022_menu_ui - cancel");
+                        if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
+                        module[0].status = StructureModuleData.NONE;
+                        structureData.modules[index] = module[0];
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -152,10 +169,9 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             spriteOverlay.getSprite().setHeight(115);
             tile.attach(spriteOverlay);
             spriteOverlay.getPos().x += 5;
-            spriteOverlay.getPos().y += 50;
+            spriteOverlay.getPos().y += 70;
         } else if(module[0] instanceof DysonSphereResourceModuleData) {
-            String desc = (module[0].level < module[0].maxLevel) ? ("Upgrade module to level " + (module[0].level + 1)) : "Max level reached";
-            GUITile tile = modulePane.addButtonTile("RESOURCE", desc, GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
+            GUITile tile = modulePane.addButtonTile("RESOURCE - " + module[0].level, desc, buttonColor, new GUICallback() {
                 @Override
                 public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                     if(mouseEvent.pressedLeftMouse()) {
@@ -164,8 +180,15 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                             queueModuleUpgrade(module[0], index);
                         } else {
                             getState().getController().queueUIAudio("0022_menu_ui - error 1");
-                            new SimplePopup(getState(), "Max level reached", "This module has already reached it's maximum level!");
+                            new SimplePopup(getState(), "Cannot Upgrade", "This module has already reached it's maximum level!");
                         }
+                    } else if(mouseEvent.pressedRightMouse()) {
+                        getState().getController().queueUIAudio("0022_menu_ui - cancel");
+                        if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
+                        module[0].status = StructureModuleData.NONE;
+                        structureData.modules[index] = module[0];
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -190,10 +213,9 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             spriteOverlay.getSprite().setHeight(115);
             tile.attach(spriteOverlay);
             spriteOverlay.getPos().x += 5;
-            spriteOverlay.getPos().y += 50;
+            spriteOverlay.getPos().y += 70;
         } else if(module[0] instanceof DysonSphereFoundryModuleData) {
-            String desc = (module[0].level < module[0].maxLevel) ? ("Upgrade module to level " + (module[0].level + 1)) : "Max level reached";
-            GUITile tile = modulePane.addButtonTile("FOUNDRY", desc, GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
+            GUITile tile = modulePane.addButtonTile("FOUNDRY - " + module[0].level, desc, buttonColor, new GUICallback() {
                 @Override
                 public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                     if(mouseEvent.pressedLeftMouse()) {
@@ -202,8 +224,15 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                             queueModuleUpgrade(module[0], index);
                         } else {
                             getState().getController().queueUIAudio("0022_menu_ui - error 1");
-                            new SimplePopup(getState(), "Max level reached", "This module has already reached it's maximum level!");
+                            new SimplePopup(getState(), "Cannot Upgrade", "This module has already reached it's maximum level!");
                         }
+                    } else if(mouseEvent.pressedRightMouse()) {
+                        getState().getController().queueUIAudio("0022_menu_ui - cancel");
+                        if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
+                        module[0].status = StructureModuleData.NONE;
+                        structureData.modules[index] = module[0];
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -228,10 +257,9 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             spriteOverlay.getSprite().setHeight(115);
             tile.attach(spriteOverlay);
             spriteOverlay.getPos().x += 5;
-            spriteOverlay.getPos().y += 50;
+            spriteOverlay.getPos().y += 70;
         } else if(module[0] instanceof DysonSphereShipyardModuleData) {
-            String desc = (module[0].level < module[0].maxLevel) ? ("Upgrade module to level " + (module[0].level + 1)) : "Max level reached";
-            GUITile tile = modulePane.addButtonTile("SHIPYARD", desc, GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
+            GUITile tile = modulePane.addButtonTile("SHIPYARD - " + module[0].level, desc, buttonColor, new GUICallback() {
                 @Override
                 public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                     if(mouseEvent.pressedLeftMouse()) {
@@ -240,8 +268,15 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                             queueModuleUpgrade(module[0], index);
                         } else {
                             getState().getController().queueUIAudio("0022_menu_ui - error 1");
-                            new SimplePopup(getState(), "Max level reached", "This module has already reached it's maximum level!");
+                            new SimplePopup(getState(), "Cannot Upgrade", "This module has already reached it's maximum level!");
                         }
+                    } else if(mouseEvent.pressedRightMouse()) {
+                        getState().getController().queueUIAudio("0022_menu_ui - cancel");
+                        if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
+                        module[0].status = StructureModuleData.NONE;
+                        structureData.modules[index] = module[0];
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -266,10 +301,9 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             spriteOverlay.getSprite().setHeight(115);
             tile.attach(spriteOverlay);
             spriteOverlay.getPos().x += 5;
-            spriteOverlay.getPos().y += 50;
+            spriteOverlay.getPos().y += 70;
         } else if(module[0] instanceof DysonSphereDefenseModuleData) {
-            String desc = (module[0].level < module[0].maxLevel) ? ("Upgrade module to level " + (module[0].level + 1)) : "Max level reached";
-            GUITile tile = modulePane.addButtonTile("DEFENSE", desc, GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
+            GUITile tile = modulePane.addButtonTile("DEFENSE - " + module[0].level, desc, buttonColor, new GUICallback() {
                 @Override
                 public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                     if(mouseEvent.pressedLeftMouse()) {
@@ -278,8 +312,15 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                             queueModuleUpgrade(module[0], index);
                         } else {
                             getState().getController().queueUIAudio("0022_menu_ui - error 1");
-                            new SimplePopup(getState(), "Max level reached", "This module has already reached it's maximum level!");
+                            new SimplePopup(getState(), "Cannot Upgrade", "This module has already reached it's maximum level!");
                         }
+                    } else if(mouseEvent.pressedRightMouse()) {
+                        getState().getController().queueUIAudio("0022_menu_ui - cancel");
+                        if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
+                        module[0].status = StructureModuleData.NONE;
+                        structureData.modules[index] = module[0];
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -304,10 +345,9 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             spriteOverlay.getSprite().setHeight(115);
             tile.attach(spriteOverlay);
             spriteOverlay.getPos().x += 5;
-            spriteOverlay.getPos().y += 50;
+            spriteOverlay.getPos().y += 70;
         } else if(module[0] instanceof DysonSphereOffenseModuleData) {
-            String desc = (module[0].level < module[0].maxLevel) ? ("Upgrade module to level " + (module[0].level + 1)) : "Max level reached";
-            GUITile tile = modulePane.addButtonTile("OFFENSE", desc, GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
+            GUITile tile = modulePane.addButtonTile("OFFENSE - " + module[0].level, desc, buttonColor, new GUICallback() {
                 @Override
                 public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                     if(mouseEvent.pressedLeftMouse()) {
@@ -316,8 +356,15 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                             queueModuleUpgrade(module[0], index);
                         } else {
                             getState().getController().queueUIAudio("0022_menu_ui - error 1");
-                            new SimplePopup(getState(), "Max level reached", "This module has already reached it's maximum level!");
+                            new SimplePopup(getState(), "Cannot Upgrade", "This module has already reached it's maximum level!");
                         }
+                    } else if(mouseEvent.pressedRightMouse()) {
+                        getState().getController().queueUIAudio("0022_menu_ui - cancel");
+                        if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
+                        module[0].status = StructureModuleData.NONE;
+                        structureData.modules[index] = module[0];
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -342,10 +389,9 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             spriteOverlay.getSprite().setHeight(115);
             tile.attach(spriteOverlay);
             spriteOverlay.getPos().x += 5;
-            spriteOverlay.getPos().y += 50;
+            spriteOverlay.getPos().y += 70;
         } else if(module[0] instanceof DysonSphereSupportModuleData) {
-            String desc = (module[0].level < module[0].maxLevel) ? ("Upgrade module to level " + (module[0].level + 1)) : "Max level reached";
-            GUITile tile = modulePane.addButtonTile("SUPPORT", desc, GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
+            GUITile tile = modulePane.addButtonTile("SUPPORT - " + module[0].level, desc, buttonColor, new GUICallback() {
                 @Override
                 public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                     if(mouseEvent.pressedLeftMouse()) {
@@ -354,8 +400,15 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                             queueModuleUpgrade(module[0], index);
                         } else {
                             getState().getController().queueUIAudio("0022_menu_ui - error 1");
-                            new SimplePopup(getState(), "Max level reached", "This module has already reached it's maximum level!");
+                            new SimplePopup(getState(), "Cannot Upgrade", "This module has already reached it's maximum level!");
                         }
+                    } else if(mouseEvent.pressedRightMouse()) {
+                        getState().getController().queueUIAudio("0022_menu_ui - cancel");
+                        if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
+                        module[0].status = StructureModuleData.NONE;
+                        structureData.modules[index] = module[0];
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -380,15 +433,23 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             spriteOverlay.getSprite().setHeight(115);
             tile.attach(spriteOverlay);
             spriteOverlay.getPos().x += 5;
-            spriteOverlay.getPos().y += 50;
+            spriteOverlay.getPos().y += 70;
         }
     }
 
     private void queueModuleUpgrade(StructureModuleData moduleData, int index) {
         if(DataUtils.adminMode()) {
+            moduleData.status = StructureModuleData.NONE;
             PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "[DEBUG]: Admin mode used to upgrade a dyson sphere module in " + GameClient.getClientPlayerState().getCurrentSector().toString() + ":\n" + moduleData.toString());
         } else {
+            for(StructureModuleData data : structureData.modules) {
+                if(data.status != StructureModuleData.NONE) {
+                    new SimplePopup(getState(), "Cannot Upgrade", "There is already a module construction or upgrade in process!").activate();
+                    return;
+                }
+            }
             //Todo: Queue module construction
+            moduleData.status = StructureModuleData.UPGRADE;
         }
         structureData.modules[index] = moduleData;
         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();

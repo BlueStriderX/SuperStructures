@@ -90,9 +90,6 @@ public class SuperStructures extends StarMod {
                             dysonSphereOutlineDrawer.outlineShape.setDrawMode(Shape3D.WIREFRAME);
                             break;
                         case Shape3D.WIREFRAME:
-                            dysonSphereOutlineDrawer.outlineShape.setDrawMode(Shape3D.FILLED);
-                            break;
-                        case Shape3D.FILLED:
                             dysonSphereOutlineDrawer.outlineShape.setDrawMode(Shape3D.NONE);
                             break;
                     }

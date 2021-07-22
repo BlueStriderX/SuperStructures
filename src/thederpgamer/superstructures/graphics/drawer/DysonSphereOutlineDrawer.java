@@ -31,6 +31,7 @@ public class DysonSphereOutlineDrawer extends ModWorldDrawer implements Drawable
     public Vector4f color;
     private float maxDistance;
     private int sectorSize;
+    private DysonSphereData sphereData;
 
     @Override
     public void onInit() {
@@ -87,6 +88,7 @@ public class DysonSphereOutlineDrawer extends ModWorldDrawer implements Drawable
         relativeSector.add(sunPositionOffset);
         relativeSector.scale(sectorSize);
         transform.origin.set(relativeSector.toVector3f());
+        if(DataUtils.getStructure(system) instanceof DysonSphereData) outlineShape.setStructureData(DataUtils.getStructure(system));
         return transform;
     }
 }

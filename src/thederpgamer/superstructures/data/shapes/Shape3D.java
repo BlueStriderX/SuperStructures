@@ -5,6 +5,10 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.schema.schine.graphicsengine.core.Drawable;
 import org.schema.schine.graphicsengine.core.GlUtil;
+import thederpgamer.superstructures.data.modules.StructureModuleData;
+import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereEmptyModuleData;
+import thederpgamer.superstructures.data.structures.SuperStructureData;
+
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
@@ -20,7 +24,6 @@ public class Shape3D implements Drawable {
 
     public static final int NONE = 0;
     public static final int WIREFRAME = 1;
-    public static final int FILLED = 2;
 
     private String name;
     private Vector3f[] vertices;
@@ -31,17 +34,25 @@ public class Shape3D implements Drawable {
     private Transform transform;
     private float scale;
     private Vector4f color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-    public Vector4f[] faceColors;
 
     static FloatBuffer bb = BufferUtils.createFloatBuffer(16);
     private static float[] glMat = new float[16];
+
+    private SuperStructureData structureData;
 
     public Shape3D(String name, Vector3f[] vertices, Vector3f[][] edges, Vector3f[][] faces) {
         this.name = name;
         this.vertices = vertices;
         this.edges = edges;
         this.faces = faces;
-        this.faceColors = new Vector4f[faces.length];
+    }
+
+    public SuperStructureData getStructureData() {
+        return structureData;
+    }
+
+    public void setStructureData(SuperStructureData structureData) {
+        this.structureData = structureData;
     }
 
     public String getName() {
@@ -118,50 +129,19 @@ public class Shape3D implements Drawable {
                     GlUtil.glDisable(GL11.GL_TEXTURE_2D);
                     GlUtil.glEnable(GL11.GL_COLOR_MATERIAL);
                     GlUtil.glDisable(GL11.GL_LIGHTING);
-                    GlUtil.glColor4f(color);
+                    int i = 0;
+                    int j = 0;
                     for(Vector3f[] edge : edges) {
                         GL11.glBegin(GL11.GL_LINES);
+                        GlUtil.glColor4f(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
+                        //GlUtil.glColor4f(getFaceColor(j)); Todo: It doesn't seem to draw the edges in order >:(
                         GL11.glVertex3f(edge[0].x, edge[0].y, edge[0].z);
                         GL11.glVertex3f(edge[1].x, edge[1].y, edge[1].z);
                         GL11.glEnd();
-                    }
-                    GlUtil.glDisable(GL11.GL_COLOR_MATERIAL);
-                    GlUtil.glEnable(GL11.GL_LIGHTING);
-                    GlUtil.glPopMatrix();
-                    break;
-                case FILLED:
-                    transform.getOpenGLMatrix(glMat);
-                    bb.rewind();
-                    bb.put(glMat);
-                    bb.rewind();
-                    GL11.glMultMatrix(bb);
-
-                    GlUtil.glPushMatrix();
-                    GlUtil.glDisable(GL11.GL_TEXTURE_2D);
-                    GlUtil.glEnable(GL11.GL_COLOR_MATERIAL);
-                    GlUtil.glDisable(GL11.GL_LIGHTING);
-                    GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-                    GL11.glBegin(GL11.GL_TRIANGLES);
-                    for(int i = 0; i < faces.length; i ++) {
-                        GlUtil.glColor4f(faceColors[i]);
-                        for(Vector3f v : faces[i]) GL11.glVertex3f(v.x, v.y, v.z);
-                    }
-                    GL11.glEnd();
-                    GL11.glCullFace(GL11.GL_BACK);
-                    GlUtil.glDisable(GL11.GL_COLOR_MATERIAL);
-                    GlUtil.glEnable(GL11.GL_LIGHTING);
-                    GlUtil.glPopMatrix();
-
-                    GlUtil.glPushMatrix();
-                    GlUtil.glDisable(GL11.GL_TEXTURE_2D);
-                    GlUtil.glEnable(GL11.GL_COLOR_MATERIAL);
-                    GlUtil.glDisable(GL11.GL_LIGHTING);
-                    GlUtil.glColor4f(color);
-                    for(Vector3f[] edge : edges) {
-                        GL11.glBegin(GL11.GL_LINES);
-                        GL11.glVertex3f(edge[0].x, edge[0].y, edge[0].z);
-                        GL11.glVertex3f(edge[1].x, edge[1].y, edge[1].z);
-                        GL11.glEnd();
+                        if(i == 4) {
+                            j ++;
+                            i = 0;
+                        } else i ++;
                     }
                     GlUtil.glDisable(GL11.GL_COLOR_MATERIAL);
                     GlUtil.glEnable(GL11.GL_LIGHTING);
@@ -187,5 +167,21 @@ public class Shape3D implements Drawable {
         float y = rand.nextFloat();
         float z = rand.nextFloat();
         return new Vector4f(x, y, z, 0.35f);
+    }
+
+    private Vector4f getFaceColor(int index) {
+        if(structureData != null && structureData.modules != null) {
+            StructureModuleData moduleData = structureData.modules[index];
+            if(moduleData != null) {
+                if(moduleData instanceof DysonSphereEmptyModuleData) return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+                switch(moduleData.status) {
+                    case StructureModuleData.NONE: return new Vector4f(0.0f, 0.0f, 1.0f, 1.0f);
+                    case StructureModuleData.CONSTRUCTION: return new Vector4f(1.0f, 1.0f, 0.0f, 1.0f);
+                    case StructureModuleData.UPGRADE: return new Vector4f(0.0f, 1.0f, 0.0f, 1.0f);
+                    case StructureModuleData.REPAIR: return new Vector4f(1.0f, 0.8f, 0.0f, 1.0f);
+                }
+            }
+        }
+        return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }

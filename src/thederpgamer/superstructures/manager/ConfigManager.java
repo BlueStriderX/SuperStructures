@@ -17,7 +17,7 @@ public class ConfigManager {
     private static final String[] defaultMainConfig = {
             "debug-mode: false",
             "auto-save-frequency: 5000",
-            "max-dyson-sphere-station-distance: 15000"
+            "max-dyson-sphere-station-distance: 12000"
     };
 
     public static void initialize(SuperStructures instance) {

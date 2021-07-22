@@ -3,6 +3,7 @@ package thederpgamer.superstructures.graphics.gui.dysonsphere;
 import api.common.GameClient;
 import api.utils.game.PlayerUtils;
 import api.utils.gui.GUIInputDialogPanel;
+import api.utils.gui.SimplePopup;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIActivationCallback;
 import org.schema.schine.graphicsengine.forms.gui.GUICallback;
@@ -284,10 +285,19 @@ public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
 
     private void queueModuleConstruction(StructureModuleData moduleData) {
         if(DataUtils.adminMode()) {
+            moduleData.status = StructureModuleData.NONE;
             PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "[DEBUG]: Admin mode used to construct a new dyson sphere module in " + GameClient.getClientPlayerState().getCurrentSector().toString() + ":\n" + moduleData.toString());
         } else {
+            for(StructureModuleData data : structureData.modules) {
+                if(data.status != StructureModuleData.NONE) {
+                    new SimplePopup(getState(), "Cannot Construct", "There is already a module construction or upgrade in process!").activate();
+                    return;
+                }
+            }
+            moduleData.status = StructureModuleData.CONSTRUCTION;
             //Todo: Queue module construction
         }
+        moduleData.level = 1;
         structureData.modules[index] = moduleData;
         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
         DataUtils.queueUpdate(structureData);
