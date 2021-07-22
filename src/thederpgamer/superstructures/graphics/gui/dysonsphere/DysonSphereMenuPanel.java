@@ -1,4 +1,4 @@
-package thederpgamer.superstructures.graphics.gui.dysonspherecontroller;
+package thederpgamer.superstructures.graphics.gui.dysonsphere;
 
 import api.utils.gui.GUIMenuPanel;
 import api.utils.gui.SimplePopup;
@@ -77,7 +77,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                 @Override
                 public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                     if(mouseEvent.pressedLeftMouse()) {
-                        //Todo: Choose module type menu
+                        (new DysonSphereModuleTypeSelectionDialog(structureData)).activate();
                     }
                 }
 
@@ -96,7 +96,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                     return true;
                 }
             });
-            GUIOverlay spriteOverlay = new GUIOverlay(ResourceManager.getSprite("dyson-sphere-empty-module-icon"), getState());
+            GUIOverlay spriteOverlay = new GUIOverlay(ResourceManager.getSprite("super-structure-empty-module-icon"), getState());
             spriteOverlay.onInit();
             spriteOverlay.getSprite().setWidth(130);
             spriteOverlay.getSprite().setHeight(115);
@@ -133,7 +133,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                     return true;
                 }
             });
-            GUIOverlay spriteOverlay = new GUIOverlay(ResourceManager.getSprite("dyson-sphere-power-module-icon"), getState());
+            GUIOverlay spriteOverlay = new GUIOverlay(ResourceManager.getSprite("super-structure-power-module-icon"), getState());
             spriteOverlay.onInit();
             spriteOverlay.getSprite().setWidth(130);
             spriteOverlay.getSprite().setHeight(115);

@@ -23,7 +23,7 @@ import thederpgamer.superstructures.data.shapes.Shape3D;
 import thederpgamer.superstructures.elements.ElementManager;
 import thederpgamer.superstructures.elements.blocks.systems.DysonSphereController;
 import thederpgamer.superstructures.graphics.drawer.DysonSphereOutlineDrawer;
-import thederpgamer.superstructures.graphics.gui.dysonspherecontroller.DysonSphereControlManager;
+import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereControlManager;
 import thederpgamer.superstructures.manager.ConfigManager;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.systems.dysonsphere.DysonSphereManagerModule;

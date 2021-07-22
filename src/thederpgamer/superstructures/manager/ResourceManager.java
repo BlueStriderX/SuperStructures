@@ -27,8 +27,14 @@ public class ResourceManager {
     };
 
     private static final String[] spriteNames = {
-            "dyson-sphere-empty-module-icon",
-            "dyson-sphere-power-module-icon"
+            "super-structure-empty-module-icon",
+            "super-structure-power-module-icon",
+            "super-structure-resource-module-icon",
+            "super-structure-foundry-module-icon",
+            "super-structure-shipyard-module-icon",
+            "super-structure-defense-module-icon",
+            "super-structure-offense-module-icon",
+            "super-structure-support-module-icon"
     };
 
     private static final String[] shapeNames = {

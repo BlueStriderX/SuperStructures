@@ -1,4 +1,4 @@
-package thederpgamer.superstructures.graphics.gui.dysonspherecontroller;
+package thederpgamer.superstructures.graphics.gui.dysonsphere;
 
 import api.common.GameClient;
 import api.utils.gui.GUIControlManager;
