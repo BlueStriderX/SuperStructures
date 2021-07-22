@@ -2,6 +2,8 @@ package thederpgamer.superstructures.graphics.gui.dysonsphere;
 
 import api.common.GameClient;
 import api.utils.gui.GUIControlManager;
+import org.schema.schine.graphicsengine.core.MouseEvent;
+import org.schema.schine.input.KeyEventInterface;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
 
 /**
@@ -21,5 +23,15 @@ public class DysonSphereControlManager extends GUIControlManager {
     @Override
     public DysonSphereMenuPanel createMenuPanel() {
         return new DysonSphereMenuPanel(getState(), structureData);
+    }
+
+    @Override
+    public void handleKeyEvent(KeyEventInterface keyEvent) {
+        if(isActive() && !isSuspended() && !isHinderedInteraction() && getState().getPlayerInputs().isEmpty()) super.handleKeyEvent(keyEvent);
+    }
+
+    @Override
+    public void handleMouseEvent(MouseEvent mouseEvent) {
+        if(isActive() && !isSuspended() && !isHinderedInteraction() && getState().getPlayerInputs().isEmpty()) super.handleMouseEvent(mouseEvent);
     }
 }

@@ -4,6 +4,7 @@ import api.common.GameClient;
 import api.config.BlockConfig;
 import api.listener.Listener;
 import api.listener.events.block.SegmentPieceActivateByPlayer;
+import api.listener.events.block.SegmentPieceAddByMetadataEvent;
 import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
@@ -24,6 +25,7 @@ import thederpgamer.superstructures.elements.ElementManager;
 import thederpgamer.superstructures.elements.blocks.systems.DysonSphereController;
 import thederpgamer.superstructures.graphics.drawer.DysonSphereOutlineDrawer;
 import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereControlManager;
+import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereMenuPanel;
 import thederpgamer.superstructures.manager.ConfigManager;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.systems.dysonsphere.DysonSphereManagerModule;
@@ -116,10 +118,15 @@ public class SuperStructures extends StarMod {
             @Override
             public void onEvent(SegmentPieceActivateByPlayer event) {
                 SegmentPiece segmentPiece = event.getSegmentPiece();
-                if(segmentPiece.getType() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
-                    if(DysonSphereUtils.isValidForDysonSphere(segmentPiece) || (GameClient.getClientPlayerState().isAdmin()) && ConfigManager.getMainConfig().getBoolean("debug-mode")) {
-                        if(dysonSphereControlManager == null) ModGUIHandler.registerNewControlManager(getSkeleton(), dysonSphereControlManager = new DysonSphereControlManager());
+                if(segmentPiece.getInfo().getId() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
+                    if(DysonSphereUtils.isValidForDysonSphere(segmentPiece) || DataUtils.adminMode()) {
+                        if(dysonSphereControlManager == null) {
+                            dysonSphereControlManager = new DysonSphereControlManager();
+                            ModGUIHandler.registerNewControlManager(getSkeleton(), dysonSphereControlManager);
+                        }
                         dysonSphereControlManager.structureData = DataUtils.getStructure(segmentPiece.getSegmentController().getSystem(new Vector3i()));
+                        dysonSphereControlManager.onInit();
+                        ((DysonSphereMenuPanel) dysonSphereControlManager.getMenuPanel()).structureData = dysonSphereControlManager.structureData;
                         dysonSphereControlManager.setActive(true);
                     } else new SimplePopup(GameClient.getClientState(), "Invalid Location", "This is an invalid location for a Dyson Sphere structure and therefore cannot be used.").activate();
                 }
@@ -141,6 +148,20 @@ public class SuperStructures extends StarMod {
             public void onEvent(SegmentPieceRemoveEvent event) {
                 if(event.getType() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
                     if(DataUtils.hasSuperStructure(event.getSegment().getSegmentController().getSystem(new Vector3i()))) DataUtils.queueRemoval(event.getSegment().getSegmentController().getSystem(new Vector3i()));
+                }
+            }
+        }, this);
+
+        StarLoader.registerListener(SegmentPieceAddByMetadataEvent.class, new Listener<SegmentPieceAddByMetadataEvent>() {
+            @Override
+            public void onEvent(SegmentPieceAddByMetadataEvent event) {
+                if(event.getType() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
+                    if(!DataUtils.hasSuperStructure(event.getSegment().getSegmentController().getSystem(new Vector3i()))) {
+                        SegmentPiece segmentPiece = event.getAsSegmentPiece(new SegmentPiece());
+                        segmentPiece.setType(event.getType());
+                        DataUtils.queueCreation(segmentPiece);
+                        //Todo: This should fetch the existing data rather than create a new entry
+                    }
                 }
             }
         }, this);

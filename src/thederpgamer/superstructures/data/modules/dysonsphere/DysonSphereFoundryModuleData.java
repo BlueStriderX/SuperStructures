@@ -7,11 +7,11 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
  * <Description>
  *
  * @author TheDerpGamer
- * @since 07/21/2021
+ * @since 07/22/2021
  */
-public class DysonSpherePowerModuleData extends StructureModuleData {
+public class DysonSphereFoundryModuleData extends StructureModuleData {
 
-    public DysonSpherePowerModuleData(SuperStructureData structureData) {
-        super("Dyson Sphere Power Module", 5, 6, structureData);
+    public DysonSphereFoundryModuleData(SuperStructureData structureData) {
+        super("Dyson Sphere Foundry Module", 5, 6, structureData);
     }
 }

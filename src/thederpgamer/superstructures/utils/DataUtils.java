@@ -13,7 +13,9 @@ import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.structures.DysonSphereData;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.elements.ElementManager;
+import thederpgamer.superstructures.manager.ConfigManager;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -55,6 +57,7 @@ public class DataUtils {
             assert structureData != null;
             switch(updateType) {
                 case CREATE:
+                    PersistentObjectUtil.removeObject(instance, structureData);
                     PersistentObjectUtil.addObject(instance, structureData);
                     break;
                 case UPDATE:
@@ -97,7 +100,7 @@ public class DataUtils {
 
     public static void queueCreation(SegmentPiece segmentPiece) {
         Vector3i systemPos = segmentPiece.getSegmentController().getSystem(new Vector3i());
-        superStructureMap.put(systemPos, generateStructureData(segmentPiece));
+        superStructureMap.put(systemPos, Objects.requireNonNull(generateStructureData(segmentPiece)));
         updateQueue.add(new Integer[] {CREATE, systemPos.x, systemPos.y, systemPos.z});
     }
 
@@ -109,8 +112,12 @@ public class DataUtils {
         updateQueue.add(new Integer[] {REMOVE, systemPos.x, systemPos.y, systemPos.z});
     }
 
+    public static boolean adminMode() {
+        return ConfigManager.getMainConfig().getBoolean("debug-mode") && GameClient.getClientPlayerState().isAdmin() && GameClient.getClientPlayerState().isCreativeModeEnabled();
+    }
+
     private static SuperStructureData generateStructureData(SegmentPiece segmentPiece) {
-        if(segmentPiece.getType() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
+        if(segmentPiece.getInfo().getId() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
             try {
                 return new DysonSphereData(GameServer.getUniverse().getSector(VoidSystem.getSunSectorPosAbs(GameClient.getClientState().getCurrentGalaxy(), segmentPiece.getSegmentController().getSystem(new Vector3i()), new Vector3i())), segmentPiece);
             } catch(IOException exception) {
