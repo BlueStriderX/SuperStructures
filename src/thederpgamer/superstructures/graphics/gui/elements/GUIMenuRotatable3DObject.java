@@ -1,8 +1,8 @@
 package thederpgamer.superstructures.graphics.gui.elements;
 
+import api.common.GameClient;
 import com.bulletphysics.linearmath.Transform;
 import org.schema.schine.common.InputHandler;
-import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.Drawable;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.core.settings.EngineSettings;
@@ -10,7 +10,6 @@ import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import org.schema.schine.input.InputState;
 import org.schema.schine.input.KeyEventInterface;
 import thederpgamer.superstructures.data.shapes.Shape3D;
-
 import javax.vecmath.Vector4f;
 
 /**
@@ -40,7 +39,7 @@ public class GUIMenuRotatable3DObject extends GUIElement implements Drawable, In
 
     @Override
     public void onInit() {
-        shape.setTransform(dependent.getTransform());
+        shape.setTransform(GameClient.getClientState().getWorldDrawer().getGuiDrawer().getHud().getTransform());
         shape.setColor(color);
         shape.setShapeScale(5.0f);
         shape.onInit();
@@ -52,11 +51,8 @@ public class GUIMenuRotatable3DObject extends GUIElement implements Drawable, In
     public void draw() {
         if(dependent.isActive() && dependent.isOnScreen()) {
             shape.setDrawMode(Shape3D.WIREFRAME);
-            Controller.getMat(Controller.modelviewMatrix, shape.getTransform());
             if(xRot != 0) shape.getTransform().basis.rotX(xRot);
             if(yRot != 0) shape.getTransform().basis.rotY(yRot);
-            shape.orientateInsideFrame();
-            shape.orientate(ORIENTATION_HORIZONTAL_MIDDLE | ORIENTATION_VERTICAL_MIDDLE);
             shape.draw();
         } else {
             resetShapeRotation();

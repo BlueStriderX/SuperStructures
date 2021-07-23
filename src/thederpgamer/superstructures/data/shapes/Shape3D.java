@@ -128,7 +128,6 @@ public class Shape3D extends GUIElement implements Drawable {
                     GL11.glMultMatrix(bb);
 
                     GlUtil.glPushMatrix();
-                    GlUtil.glMultMatrix(transform);
                     GlUtil.glDisable(GL11.GL_TEXTURE_2D);
                     GlUtil.glEnable(GL11.GL_COLOR_MATERIAL);
                     GlUtil.glDisable(GL11.GL_LIGHTING);

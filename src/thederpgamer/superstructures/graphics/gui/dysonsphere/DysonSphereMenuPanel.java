@@ -61,6 +61,12 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
         createSettingsTab(settingsTab);
     }
 
+    @Override
+    public void draw() {
+        super.draw();
+        if(guiWindow.getSelectedTab() == 0) statusModel.draw();
+    }
+
     public void refreshTabs() {
         statusModel.resetShapeRotation();
         modulePane.clear();
