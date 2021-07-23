@@ -1,7 +1,5 @@
 package thederpgamer.superstructures.data.modules;
 
-import api.common.GameCommon;
-import thederpgamer.superstructures.data.entity.structure.SuperStructureModule;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
 import java.io.Serializable;
 import java.util.HashMap;
@@ -37,10 +35,6 @@ public class StructureModuleData implements Serializable {
         this.controllerEntityId = structureData.entityId;
         this.constructionMap = new HashMap<>();
         this.status = NONE;
-    }
-
-    public SuperStructureModule getEntity() {
-        return (SuperStructureModule) GameCommon.getGameObject(moduleEntityId);
     }
 
     public String getDesc() {

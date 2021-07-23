@@ -19,7 +19,6 @@ import org.lwjgl.input.Keyboard;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.resource.ResourceLoader;
-import thederpgamer.superstructures.data.commands.UpgradeSuperStructureCommand;
 import thederpgamer.superstructures.data.shapes.Shape3D;
 import thederpgamer.superstructures.elements.ElementManager;
 import thederpgamer.superstructures.elements.blocks.systems.DysonSphereController;
@@ -62,7 +61,6 @@ public class SuperStructures extends StarMod {
         ConfigManager.initialize(this);
         DataUtils.initialize();
         registerListeners();
-        registerCommands();
         startRunners();
     }
 
@@ -162,10 +160,6 @@ public class SuperStructures extends StarMod {
                 }
             }
         }, this);
-    }
-
-    private void registerCommands() {
-        StarLoader.registerCommand(new UpgradeSuperStructureCommand());
     }
 
     private void startRunners() {

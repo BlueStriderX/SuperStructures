@@ -37,7 +37,7 @@ public class DysonSphereOutlineDrawer extends ModWorldDrawer implements Drawable
     public void onInit() {
         sectorSize = (int) ServerConfig.SECTOR_SIZE.getCurrentState();
         outlineShape = ResourceManager.getShape("dodecahedron");
-        outlineShape.setScale(sectorSize * 0.8f);
+        outlineShape.setShapeScale(sectorSize * 0.8f);
         outlineShape.setTransform(new Transform());
         outlineShape.onInit();
         maxDistance = (float) ConfigManager.getMainConfig().getDouble("max-dyson-sphere-station-distance");

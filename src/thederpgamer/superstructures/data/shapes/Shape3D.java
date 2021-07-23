@@ -1,14 +1,15 @@
 package thederpgamer.superstructures.data.shapes;
 
+import api.common.GameClient;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.schema.schine.graphicsengine.core.Drawable;
 import org.schema.schine.graphicsengine.core.GlUtil;
+import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereEmptyModuleData;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
-
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.FloatBuffer;
@@ -20,7 +21,7 @@ import java.util.Random;
  * @author TheDerpGamer
  * @since 07/21/2021
  */
-public class Shape3D implements Drawable {
+public class Shape3D extends GUIElement implements Drawable {
 
     public static final int NONE = 0;
     public static final int WIREFRAME = 1;
@@ -41,6 +42,7 @@ public class Shape3D implements Drawable {
     private SuperStructureData structureData;
 
     public Shape3D(String name, Vector3f[] vertices, Vector3f[][] edges, Vector3f[][] faces) {
+        super(GameClient.getClientState());
         this.name = name;
         this.vertices = vertices;
         this.edges = edges;
@@ -79,11 +81,11 @@ public class Shape3D implements Drawable {
         this.transform = transform;
     }
 
-    public float getScale() {
+    public float getShapeScale() {
         return scale;
     }
 
-    public void setScale(float scale) {
+    public void setShapeScale(float scale) {
         this.scale = scale;
     }
 
@@ -126,22 +128,16 @@ public class Shape3D implements Drawable {
                     GL11.glMultMatrix(bb);
 
                     GlUtil.glPushMatrix();
+                    GlUtil.glMultMatrix(transform);
                     GlUtil.glDisable(GL11.GL_TEXTURE_2D);
                     GlUtil.glEnable(GL11.GL_COLOR_MATERIAL);
                     GlUtil.glDisable(GL11.GL_LIGHTING);
-                    int i = 0;
-                    int j = 0;
+                    GlUtil.glColor4f(color);
                     for(Vector3f[] edge : edges) {
                         GL11.glBegin(GL11.GL_LINES);
-                        GlUtil.glColor4f(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f));
-                        //GlUtil.glColor4f(getFaceColor(j)); Todo: It doesn't seem to draw the edges in order >:(
                         GL11.glVertex3f(edge[0].x, edge[0].y, edge[0].z);
                         GL11.glVertex3f(edge[1].x, edge[1].y, edge[1].z);
                         GL11.glEnd();
-                        if(i == 4) {
-                            j ++;
-                            i = 0;
-                        } else i ++;
                     }
                     GlUtil.glDisable(GL11.GL_COLOR_MATERIAL);
                     GlUtil.glEnable(GL11.GL_LIGHTING);
@@ -183,5 +179,15 @@ public class Shape3D implements Drawable {
             }
         }
         return new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+
+    @Override
+    public float getWidth() {
+        return scale;
+    }
+
+    @Override
+    public float getHeight() {
+        return scale;
     }
 }

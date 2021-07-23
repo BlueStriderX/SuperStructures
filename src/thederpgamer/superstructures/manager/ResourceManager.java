@@ -95,7 +95,10 @@ public class ResourceManager {
     }
 
     public static Shape3D getShape(String shapeName) {
-        return shapeMap.get(shapeName);
+        if(shapeMap.containsKey(shapeName)) {
+            Shape3D shape = shapeMap.get(shapeName);
+            return new Shape3D(shapeName, shape.getVertices(), shape.getEdges(), shape.getFaces());
+        } else return null;
     }
 
     private static Shape3D loadShape(String shapeName) throws Exception {

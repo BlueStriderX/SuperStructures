@@ -18,8 +18,10 @@ import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.modules.dysonsphere.*;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
+import thederpgamer.superstructures.graphics.gui.elements.GUIMenuRotatable3DObject;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.DataUtils;
+import javax.vecmath.Vector4f;
 
 /**
  * <Description>
@@ -34,6 +36,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private GUIContentPane moduleTab;
     private GUIContentPane settingsTab;
 
+    private GUIMenuRotatable3DObject statusModel;
     private GUITilePane<StructureModuleData> modulePane;
 
     public DysonSphereMenuPanel(InputState inputState, SuperStructureData structureData) {
@@ -58,13 +61,16 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
         createSettingsTab(settingsTab);
     }
 
-    public void redrawModules() {
+    public void refreshTabs() {
+        statusModel.resetShapeRotation();
         modulePane.clear();
         for(int i = 0; i < structureData.modules.length; i ++) createModuleTile(modulePane, i);
     }
 
     private void createStatusTab(GUIContentPane statusTab) {
-        //Todo: Status tab
+        statusModel = new GUIMenuRotatable3DObject(getState(), ResourceManager.getShape("dodecahedron"), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), statusTab, statusTab.getTextWidth() / 2.0f, statusTab.getTextWidth() / 2.0f);
+        statusModel.onInit();
+        statusTab.getContent(0).attach(statusModel);
     }
 
     private void createModuleTab(GUIContentPane moduleTab) {
@@ -73,7 +79,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
         for(int i = 0; i < structureData.modules.length; i ++) createModuleTile(modulePane, i);
         moduleTab.getContent(0).attach(modulePane);
     }
-
 
     private void createSettingsTab(GUIContentPane settingsTab) {
         //Todo: Settings tab
@@ -143,7 +148,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                         DataUtils.queueUpdate(structureData);
                     }
                 }
@@ -187,7 +192,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                         DataUtils.queueUpdate(structureData);
                     }
                 }
@@ -231,7 +236,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                         DataUtils.queueUpdate(structureData);
                     }
                 }
@@ -275,7 +280,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                         DataUtils.queueUpdate(structureData);
                     }
                 }
@@ -319,7 +324,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                         DataUtils.queueUpdate(structureData);
                     }
                 }
@@ -363,7 +368,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                         DataUtils.queueUpdate(structureData);
                     }
                 }
@@ -407,7 +412,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].status == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                         DataUtils.queueUpdate(structureData);
                     }
                 }
@@ -452,7 +457,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             moduleData.status = StructureModuleData.UPGRADE;
         }
         structureData.modules[index] = moduleData;
-        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
+        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
         DataUtils.queueUpdate(structureData);
     }
 }

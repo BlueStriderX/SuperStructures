@@ -1,27 +1,15 @@
 package thederpgamer.superstructures.utils;
 
 import api.common.GameClient;
-import api.common.GameCommon;
 import api.common.GameServer;
-import org.schema.game.common.controller.SpaceStation;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.common.data.world.StellarSystem;
-import org.schema.game.server.controller.BluePrintController;
-import org.schema.game.server.data.EntityRequest;
 import org.schema.game.server.data.ServerConfig;
-import org.schema.game.server.data.blueprintnw.BlueprintEntry;
-import org.schema.schine.network.StateInterface;
-import thederpgamer.superstructures.SuperStructures;
-import thederpgamer.superstructures.data.entity.structure.SuperStructureModule;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.structures.DysonSphereData;
 import thederpgamer.superstructures.manager.ConfigManager;
-import thederpgamer.superstructures.manager.ResourceManager;
-
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * <Description>
@@ -49,16 +37,6 @@ public class DysonSphereUtils {
     }
 
     public static void spawnNewModule(StructureModuleData data, int index) {
-        
-        module.setUniqueIdentifier(UUID.randomUUID().toString()); //Todo: Proper unique identifier?
-        //module.getMinPos().set(); wut
-        //module.getMaxPos().set(); wut
-        module.setId(((StateInterface) Objects.requireNonNull(GameCommon.getGameState())).getNextFreeObjectId());
-        data.moduleEntityId = module.getId();
-        //module.setSectorId(); Todo: Figure out module sector placement
-        //module.setRealName(); no idea
-        //module.setLoadedFromChunk16(); uh
-        module.initialize();
-        //module.getInitialTransform().set(); Todo: Figure out module transform
+
     }
 }
