@@ -14,6 +14,7 @@ import thederpgamer.superstructures.data.structures.DysonSphereData;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.elements.ElementManager;
 import thederpgamer.superstructures.manager.ConfigManager;
+
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -41,6 +42,20 @@ public class DataUtils {
             superStructureMap.put(structureData.systemPos, structureData);
         }
     }
+
+    /* Can't use input streams >:(
+    public static BlueprintEntry getModuleBp(StructureModuleData moduleData) {
+        String moduleType = "";
+        if(moduleData instanceof DysonSpherePowerModuleData) moduleType = "powermodule";
+        else if(moduleData instanceof DysonSphereResourceModuleData) moduleType = "resourcemodule";
+        else if(moduleData instanceof DysonSphereFoundryModuleData) moduleType = "foundry";
+        else if(moduleData instanceof DysonSphereShipyardModuleData) moduleType = "shipyard";
+        else if(moduleData instanceof DysonSphereOffenseModuleData) moduleType = "offense";
+        else if(moduleData instanceof DysonSphereDefenseModuleData) moduleType = "defense";
+        else if(moduleData instanceof DysonSphereSupportModuleData) moduleType = "support";
+        return BluePrintController.active.importFile(SuperStructures.getInstance().getJarResource("thederpgamer/superstructures/resources/blueprints/dysonsphere/" + moduleType + ".sment"), null).get(0);
+    }
+     */
 
     public static void saveData() {
         updateStructureMap();

@@ -17,6 +17,7 @@ import thederpgamer.superstructures.data.modules.dysonsphere.*;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.DataUtils;
+import thederpgamer.superstructures.utils.DysonSphereUtils;
 
 /**
  * <Description>
@@ -150,7 +151,7 @@ public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
         foundryOverlay.getPos().x += 5;
         foundryOverlay.getPos().y += 130;
 
-        GUITile shipyardTile = tilePane.addButtonTile("SHIPYARD", "Assembles ships on a large industrial scale using the power of it's star.", GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
+        GUITile shipyardTile = tilePane.addButtonTile("SHIPYARD", "Assembles ships on an industrial scale using the power of a star.", GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
             @Override
             public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
                 if(mouseEvent.pressedLeftMouse()) {
@@ -301,5 +302,6 @@ public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
         structureData.modules[index] = moduleData;
         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).redrawModules();
         DataUtils.queueUpdate(structureData);
+        DysonSphereUtils.spawnNewModule(structureData.modules[index], index);
     }
 }
