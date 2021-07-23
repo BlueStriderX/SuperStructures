@@ -10,6 +10,7 @@ import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import org.schema.schine.input.InputState;
 import org.schema.schine.input.KeyEventInterface;
 import thederpgamer.superstructures.data.shapes.Shape3D;
+
 import javax.vecmath.Vector4f;
 
 /**
@@ -41,16 +42,15 @@ public class GUIMenuRotatable3DObject extends GUIElement implements Drawable, In
     public void onInit() {
         shape.setTransform(GameClient.getClientState().getWorldDrawer().getGuiDrawer().getHud().getTransform());
         shape.setColor(color);
-        shape.setShapeScale(5.0f);
+        shape.setShapeScale(100.0f);
         shape.onInit();
         dependent.attach(shape);
-        shape.setInside(true);
     }
 
     @Override
     public void draw() {
         if(dependent.isActive() && dependent.isOnScreen()) {
-            shape.setDrawMode(Shape3D.WIREFRAME);
+            shape.setDrawMode(Shape3D.GUI);
             if(xRot != 0) shape.getTransform().basis.rotX(xRot);
             if(yRot != 0) shape.getTransform().basis.rotY(yRot);
             shape.draw();
