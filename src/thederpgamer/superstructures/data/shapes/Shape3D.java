@@ -4,18 +4,18 @@ import api.common.GameClient;
 import com.bulletphysics.linearmath.Transform;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.util.vector.Matrix4f;
-import org.schema.game.client.data.GameClientState;
-import org.schema.schine.graphicsengine.core.Controller;
+import org.lwjgl.opengl.GL30;
 import org.schema.schine.graphicsengine.core.Drawable;
 import org.schema.schine.graphicsengine.core.GlUtil;
+import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereEmptyModuleData;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
+
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.util.Random;
 
@@ -29,7 +29,7 @@ public class Shape3D extends GUIElement implements Drawable {
 
     public static final int NONE = 0;
     public static final int WIREFRAME = 1;
-    public static final int GUI = 2;
+    public static final int WIREFRAME_GUI = 2;
 
     private String name;
     private Vector3f[] vertices;
@@ -45,6 +45,7 @@ public class Shape3D extends GUIElement implements Drawable {
     private static float[] glMat = new float[16];
 
     private SuperStructureData structureData;
+    public Sprite guiSprite;
 
     public Shape3D(String name, Vector3f[] vertices, Vector3f[][] edges, Vector3f[][] faces) {
         super(GameClient.getClientState());
@@ -126,13 +127,13 @@ public class Shape3D extends GUIElement implements Drawable {
                 case NONE:
                     break;
                 case WIREFRAME:
-                    transform.setFromOpenGLMatrix(glMat);
+                    transform.getOpenGLMatrix(glMat);
                     bb.rewind();
                     bb.put(glMat);
                     bb.rewind();
-                    GL11.glMultMatrix(bb);
 
                     GlUtil.glPushMatrix();
+                    GlUtil.glMultMatrix(transform);
                     GlUtil.glDisable(GL11.GL_TEXTURE_2D);
                     GlUtil.glEnable(GL11.GL_COLOR_MATERIAL);
                     GlUtil.glDisable(GL11.GL_LIGHTING);
@@ -145,61 +146,48 @@ public class Shape3D extends GUIElement implements Drawable {
                     }
                     GlUtil.glDisable(GL11.GL_COLOR_MATERIAL);
                     GlUtil.glEnable(GL11.GL_LIGHTING);
-                    GlUtil.glEnable(GL11.GL_TEXTURE_2D);
                     GlUtil.glPopMatrix();
                     break;
-                case GUI:
-                    Matrix4f modelviewMatrix = Controller.modelviewMatrix;
-                    bb.rewind();
-                    modelviewMatrix.store(bb);
-                    bb.rewind();
-                    bb.get(glMat);
-                    transform.setFromOpenGLMatrix(glMat);
-                    transform.origin.set(0, 0, 0);
+                case WIREFRAME_GUI:
                     GlUtil.glPushMatrix();
-                    setInside(false);
-                    transform();
+                    //Initialize frame buffer
+                    int frameBuffer = GL30.glGenFramebuffers();
+                    int renderBuffer = GL30.glGenRenderbuffers();
+                    int colorBuffer = GL11.glGenTextures();
+                    GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frameBuffer);
 
-                    GlUtil.glDisable(GL11.GL_DEPTH_TEST);
-                    GlUtil.glEnable(GL11.GL_TEXTURE_2D);
-                    GlUtil.glEnable(GL11.GL_LIGHTING);
-                    GlUtil.glEnable(GL11.GL_BLEND);
-                    GlUtil.glDepthMask(false);
-                    GUIElement.enableOrthogonal3d();
-                    GlUtil.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-                    GlUtil.glMultMatrix(transform);
-                    GlUtil.glPushMatrix();
-                    int x = 0;
-                    int y = 0;
-                    GlUtil.translateModelview(x, y, 100);
-                    GlUtil.scaleModelview(scale, -scale, scale);
-                    GlUtil.glMultMatrix(transform);
-                    Transform m = new Transform();
-                    m.setIdentity();
-                    if(((GameClientState) getState()).getCurrentPlayerObject() != null) m.basis.set(((GameClientState) getState()).getCurrentPlayerObject().getWorldTransform().basis);
-                    GlUtil.glMultMatrix(m);
+                    //Initialize texture buffer
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, colorBuffer);
+                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, (int) getWidth(), (int) getHeight(), 0, GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, (ByteBuffer) null);
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+                    GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+                    GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0); //Unbind texture
 
-                    GlUtil.glDisable(GL11.GL_TEXTURE_2D);
-                    GlUtil.glEnable(GL11.GL_COLOR_MATERIAL);
-                    GlUtil.glDisable(GL11.GL_LIGHTING);
+                    //Initialize render buffer
+                    GL30.glBindRenderbuffer(GL30.GL_RENDERBUFFER, renderBuffer);
+                    GL30.glRenderbufferStorage(GL30.GL_RENDERBUFFER, GL30.GL_DEPTH24_STENCIL8, (int) getWidth(), (int) getHeight());
+
+                    GL30.glFramebufferTexture2D(GL30.GL_FRAMEBUFFER, GL30.GL_COLOR_ATTACHMENT0, GL11.GL_TEXTURE_2D, colorBuffer, 0);
+                    GL30.glFramebufferRenderbuffer(GL30.GL_FRAMEBUFFER, GL30.GL_DEPTH_STENCIL_ATTACHMENT, GL30.GL_RENDERBUFFER, renderBuffer);
+
+                    GL11.glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+                    GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+                    GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+                    updateRotation(); //Update rotation
                     GlUtil.glColor4f(color);
-                    for(Vector3f[] edge : edges) {
+                    for(Vector3f[] edge : edges) { //Draw edges
                         GL11.glBegin(GL11.GL_LINES);
                         GL11.glVertex3f(edge[0].x, edge[0].y, edge[0].z);
                         GL11.glVertex3f(edge[1].x, edge[1].y, edge[1].z);
                         GL11.glEnd();
                     }
-                    GlUtil.glDisable(GL11.GL_COLOR_MATERIAL);
-                    GlUtil.glEnable(GL11.GL_LIGHTING);
-                    GlUtil.glEnable(GL11.GL_TEXTURE_2D);
-                    GlUtil.glPopMatrix();
 
-                    GUIElement.disableOrthogonal();
-                    GlUtil.glEnable(GL11.GL_LIGHTING);
-                    GlUtil.glDisable(GL11.GL_NORMALIZE);
-                    GlUtil.glEnable(GL11.GL_DEPTH_TEST);
-                    GlUtil.glDepthMask(true);
+                    GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
+                    GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+                    GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
                     GlUtil.glPopMatrix();
+                    if(guiSprite != null) guiSprite.getMaterial().getTexture().setTextureId(colorBuffer);
                     break;
             }
         }
@@ -213,6 +201,12 @@ public class Shape3D extends GUIElement implements Drawable {
     @Override
     public boolean isInvisible() {
         return false;
+    }
+
+    private void updateRotation() {
+        for(Vector3f[] edge : edges) {
+            for(Vector3f point : edge) transform.transform(point);
+        }
     }
 
     private Vector4f getRandomColor() {

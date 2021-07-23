@@ -6,7 +6,9 @@ import org.schema.schine.common.InputHandler;
 import org.schema.schine.graphicsengine.core.Drawable;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.core.settings.EngineSettings;
+import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
+import org.schema.schine.graphicsengine.forms.gui.GUIOverlay;
 import org.schema.schine.input.InputState;
 import org.schema.schine.input.KeyEventInterface;
 import thederpgamer.superstructures.data.shapes.Shape3D;
@@ -42,15 +44,19 @@ public class GUIMenuRotatable3DObject extends GUIElement implements Drawable, In
     public void onInit() {
         shape.setTransform(GameClient.getClientState().getWorldDrawer().getGuiDrawer().getHud().getTransform());
         shape.setColor(color);
-        shape.setShapeScale(100.0f);
+        shape.setShapeScale(5.0f);
         shape.onInit();
-        dependent.attach(shape);
+        shape.guiSprite = new Sprite((int) shape.getWidth(), (int) shape.getHeight());
+        shape.guiSprite.onInit();
+        GUIOverlay overlay = new GUIOverlay(shape.guiSprite, getState());
+        overlay.onInit();
+        dependent.attach(overlay);
     }
 
     @Override
     public void draw() {
         if(dependent.isActive() && dependent.isOnScreen()) {
-            shape.setDrawMode(Shape3D.GUI);
+            shape.setDrawMode(Shape3D.WIREFRAME_GUI);
             if(xRot != 0) shape.getTransform().basis.rotX(xRot);
             if(yRot != 0) shape.getTransform().basis.rotY(yRot);
             shape.draw();
