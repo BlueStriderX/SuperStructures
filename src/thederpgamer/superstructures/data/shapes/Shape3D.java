@@ -13,7 +13,6 @@ import org.schema.schine.graphicsengine.texture.Texture;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereEmptyModuleData;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
-
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
 import java.nio.ByteBuffer;

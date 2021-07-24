@@ -40,4 +40,8 @@ public class StructureModuleData implements Serializable {
     public String getDesc() {
         return "";
     }
+
+    public String getMeshName() {
+        return name.toLowerCase().replace(" ", "-");
+    }
 }

@@ -2,10 +2,13 @@ package thederpgamer.superstructures.manager;
 
 import api.utils.textures.StarLoaderTexture;
 import org.apache.commons.io.IOUtils;
+import org.schema.schine.graphicsengine.core.ResourceException;
+import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.shapes.Shape3D;
+
 import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,9 +44,23 @@ public class ResourceManager {
             "dodecahedron"
     };
 
-    private static HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
-    private static HashMap<String, Sprite> spriteMap = new HashMap<>();
-    private static HashMap<String, Shape3D> shapeMap = new HashMap<>();
+    private static final String[] meshNames = {
+            "dyson-sphere-full"
+            /*
+            "dyson-sphere-power-module",
+            "dyson-sphere-resource-module",
+            "dyson-sphere-foundry-module",
+            "dyson-sphere-shipyard-module",
+            "dyson-sphere-offense-module",
+            "dyson-sphere-defense-module",
+            "dyson-sphere-support-module"
+             */
+    };
+
+    private static final HashMap<String, StarLoaderTexture> textureMap = new HashMap<>();
+    private static final HashMap<String, Sprite> spriteMap = new HashMap<>();
+    private static final HashMap<String, Shape3D> shapeMap = new HashMap<>();
+    private static final HashMap<String, Mesh> meshMap = new HashMap<>();
 
     public static void loadResources(final SuperStructures instance, final ResourceLoader loader) {
 
@@ -75,10 +92,22 @@ public class ResourceManager {
                     }
                 }
 
+                //Load Shapes
                 for(String shapeName : shapeNames) {
                     try {
                         shapeMap.put(shapeName, loadShape(shapeName));
                     } catch(Exception exception) {
+                        exception.printStackTrace();
+                    }
+                }
+
+                //Load meshes
+                for(String meshName : meshNames) {
+                    try {
+                        loader.getMeshLoader().loadModMesh(instance, meshName, instance.getJarResource("thederpgamer/superstructures/resources/meshes/" + meshName + ".zip"), null);
+                        Mesh mesh = loader.getMeshLoader().getModMesh(SuperStructures.getInstance(), meshName);
+                        mesh.setFirstDraw(true);
+                    } catch(ResourceException | IOException exception) {
                         exception.printStackTrace();
                     }
                 }
@@ -99,6 +128,10 @@ public class ResourceManager {
             Shape3D shape = shapeMap.get(shapeName);
             return new Shape3D(shapeName, shape.getVertices(), shape.getEdges(), shape.getFaces());
         } else return null;
+    }
+
+    public static Mesh getMesh(String meshName) {
+        return meshMap.get(meshName);
     }
 
     private static Shape3D loadShape(String shapeName) throws Exception {

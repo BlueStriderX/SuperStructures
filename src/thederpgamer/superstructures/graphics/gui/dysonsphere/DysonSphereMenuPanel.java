@@ -5,6 +5,7 @@ import api.utils.game.PlayerUtils;
 import api.utils.gui.GUIMenuPanel;
 import api.utils.gui.SimplePopup;
 import org.schema.schine.graphicsengine.core.MouseEvent;
+import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.gui.GUIActivationCallback;
 import org.schema.schine.graphicsengine.forms.gui.GUICallback;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
@@ -18,10 +19,10 @@ import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.modules.dysonsphere.*;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
-import thederpgamer.superstructures.graphics.gui.elements.GUIMenuRotatable3DObject;
+import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.DataUtils;
-import javax.vecmath.Vector4f;
+import thederpgamer.superstructures.utils.DysonSphereUtils;
 
 /**
  * <Description>
@@ -36,12 +37,19 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private GUIContentPane moduleTab;
     private GUIContentPane settingsTab;
 
-    private GUIMenuRotatable3DObject statusModel;
+    private Mesh dysonSphereMesh;
+    private GUIMeshOverlay statusModel;
     private GUITilePane<StructureModuleData> modulePane;
 
     public DysonSphereMenuPanel(InputState inputState, SuperStructureData structureData) {
         super(inputState, "DysonSphereMenuPanel", 800, 250);
         this.structureData = structureData;
+    }
+
+    @Override
+    public void onInit() {
+        this.dysonSphereMesh = DysonSphereUtils.createMesh(structureData);
+        super.onInit();
     }
 
     @Override
@@ -68,13 +76,12 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     }
 
     public void refreshTabs() {
-        statusModel.resetShapeRotation();
         modulePane.clear();
         for(int i = 0; i < structureData.modules.length; i ++) createModuleTile(modulePane, i);
     }
 
     private void createStatusTab(GUIContentPane statusTab) {
-        statusModel = new GUIMenuRotatable3DObject(getState(), ResourceManager.getShape("dodecahedron"), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), statusTab, statusTab.getTextWidth() / 2.0f, statusTab.getTextWidth() / 2.0f);
+        statusModel = new GUIMeshOverlay(getState(), dysonSphereMesh, statusTab, (int) statusTab.getWidth() / 4, (int) statusTab.getHeight() / 4, 5.0f);
         statusModel.onInit();
         statusTab.getContent(0).attach(statusModel);
     }

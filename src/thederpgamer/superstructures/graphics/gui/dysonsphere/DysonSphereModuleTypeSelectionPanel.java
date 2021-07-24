@@ -17,7 +17,6 @@ import thederpgamer.superstructures.data.modules.dysonsphere.*;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.DataUtils;
-import thederpgamer.superstructures.utils.DysonSphereUtils;
 
 /**
  * <Description>
@@ -302,6 +301,5 @@ public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
         structureData.modules[index] = moduleData;
         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
         DataUtils.queueUpdate(structureData);
-        DysonSphereUtils.spawnNewModule(structureData.modules[index], index);
     }
 }
