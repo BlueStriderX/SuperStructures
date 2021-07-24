@@ -12,7 +12,6 @@ import org.schema.schine.graphicsengine.forms.gui.GUIOverlay;
 import org.schema.schine.input.InputState;
 import org.schema.schine.input.KeyEventInterface;
 import thederpgamer.superstructures.data.shapes.Shape3D;
-
 import javax.vecmath.Vector4f;
 
 /**
@@ -46,10 +45,9 @@ public class GUIMenuRotatable3DObject extends GUIElement implements Drawable, In
         shape.setColor(color);
         shape.setShapeScale(5.0f);
         shape.onInit();
-        shape.guiSprite = new Sprite((int) shape.getWidth(), (int) shape.getHeight());
+        shape.guiSprite = new Sprite((int) dependent.getWidth(), (int) dependent.getHeight());
         shape.guiSprite.onInit();
         GUIOverlay overlay = new GUIOverlay(shape.guiSprite, getState());
-        overlay.onInit();
         dependent.attach(overlay);
     }
 

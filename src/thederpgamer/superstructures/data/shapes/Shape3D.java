@@ -9,6 +9,7 @@ import org.schema.schine.graphicsengine.core.Drawable;
 import org.schema.schine.graphicsengine.core.GlUtil;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
+import org.schema.schine.graphicsengine.texture.Texture;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereEmptyModuleData;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
@@ -43,6 +44,10 @@ public class Shape3D extends GUIElement implements Drawable {
 
     static FloatBuffer bb = BufferUtils.createFloatBuffer(16);
     private static float[] glMat = new float[16];
+
+    private int frameBuffer;
+    private int renderBuffer;
+    private int colorBuffer;
 
     private SuperStructureData structureData;
     public Sprite guiSprite;
@@ -125,6 +130,9 @@ public class Shape3D extends GUIElement implements Drawable {
         if(scale != 0 && transform != null) {
             switch(drawMode) {
                 case NONE:
+                    frameBuffer = 0;
+                    renderBuffer = 0;
+                    colorBuffer = 0;
                     break;
                 case WIREFRAME:
                     transform.getOpenGLMatrix(glMat);
@@ -149,11 +157,10 @@ public class Shape3D extends GUIElement implements Drawable {
                     GlUtil.glPopMatrix();
                     break;
                 case WIREFRAME_GUI:
-                    GlUtil.glPushMatrix();
                     //Initialize frame buffer
-                    int frameBuffer = GL30.glGenFramebuffers();
-                    int renderBuffer = GL30.glGenRenderbuffers();
-                    int colorBuffer = GL11.glGenTextures();
+                    if(frameBuffer == 0) frameBuffer = GL30.glGenFramebuffers();
+                    if(renderBuffer == 0) renderBuffer = GL30.glGenRenderbuffers();
+                    if(colorBuffer == 0) colorBuffer = GL11.glGenTextures();
                     GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, frameBuffer);
 
                     //Initialize texture buffer
@@ -174,6 +181,7 @@ public class Shape3D extends GUIElement implements Drawable {
                     GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
                     GL11.glEnable(GL11.GL_DEPTH_TEST);
 
+                    GlUtil.glPushMatrix();
                     updateRotation(); //Update rotation
                     GlUtil.glColor4f(color);
                     for(Vector3f[] edge : edges) { //Draw edges
@@ -182,12 +190,19 @@ public class Shape3D extends GUIElement implements Drawable {
                         GL11.glVertex3f(edge[1].x, edge[1].y, edge[1].z);
                         GL11.glEnd();
                     }
+                    GlUtil.glPopMatrix();
 
                     GL30.glBindFramebuffer(GL30.GL_FRAMEBUFFER, 0);
-                    GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-                    GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
-                    GlUtil.glPopMatrix();
-                    if(guiSprite != null) guiSprite.getMaterial().getTexture().setTextureId(colorBuffer);
+                    //GL11.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+                    //GL11.glClear(GL11.GL_COLOR_BUFFER_BIT);
+                    if(guiSprite != null) {
+                        if(guiSprite.getMaterial().getTexture() == null) guiSprite.getMaterial().setTexture(new Texture(GL11.GL_TEXTURE_2D, colorBuffer, "SHAPE3D"));
+                        else guiSprite.getMaterial().getTexture().setTextureId(colorBuffer);
+                        guiSprite.getMaterial().getTexture().setWidth((int) getWidth());
+                        guiSprite.getMaterial().getTexture().setHeight((int) getHeight());
+                        guiSprite.getMaterial().getTexture().setTextureWidth((int) getWidth());
+                        guiSprite.getMaterial().getTexture().setTextureHeight((int) getHeight());
+                    }
                     break;
             }
         }
@@ -235,11 +250,11 @@ public class Shape3D extends GUIElement implements Drawable {
 
     @Override
     public float getWidth() {
-        return scale;
+        return guiSprite.getWidth();
     }
 
     @Override
     public float getHeight() {
-        return scale;
+        return guiSprite.getHeight();
     }
 }
