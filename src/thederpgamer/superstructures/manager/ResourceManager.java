@@ -107,6 +107,7 @@ public class ResourceManager {
                         loader.getMeshLoader().loadModMesh(instance, meshName, instance.getJarResource("thederpgamer/superstructures/resources/meshes/" + meshName + ".zip"), null);
                         Mesh mesh = loader.getMeshLoader().getModMesh(SuperStructures.getInstance(), meshName);
                         mesh.setFirstDraw(true);
+                        meshMap.put(meshName, mesh);
                     } catch(ResourceException | IOException exception) {
                         exception.printStackTrace();
                     }

@@ -60,7 +60,6 @@ public class GUIMeshOverlay extends GUIOverlay {
     public void draw() {
         if(!initialized) onInit();
         if(dependent.isActive() && dependent.isOnScreen()) {
-            super.draw();
             Matrix4f modelViewMatrix = Controller.modelviewMatrix;
             fb.rewind();
             modelViewMatrix.store(fb);
@@ -71,7 +70,7 @@ public class GUIMeshOverlay extends GUIOverlay {
 
             GUIElement.enableOrthogonal3d();
             GlUtil.glPushMatrix();
-            GlUtil.translateModelview(getPos().x, getPos().y, 0);
+            GlUtil.translateModelview(getSprite().getPos().x, getSprite().getPos().y, 0);
             GlUtil.scaleModelview(displayScale, -displayScale, displayScale);
             GlUtil.glMultMatrix(transform);
             GlUtil.glDisable(GL11.GL_LIGHTING);
@@ -80,23 +79,29 @@ public class GUIMeshOverlay extends GUIOverlay {
             GlUtil.glDisable(GL11.GL_CULL_FACE);
             GlUtil.glEnable(GL11.GL_DEPTH_TEST);
 
-            try {
-                setWireFrameField();
-            } catch(Exception ignored) { }
 
+            mesh.updateBound();
+            mesh.setType(Mesh.TYPE_VERTEX_BUFFER_OBJ);
+            mesh.setDrawMode(GL11.GL_TRIANGLE_STRIP);
+            mesh.setLoaded(true);
+            mesh.setVisibility(1);
             mesh.draw();
-            mesh.getMaterial().attach(0);
-            GlUtil.glDisable(GL11.GL_LIGHTING);
-            mesh.drawVBO();
-            mesh.getMaterial().detach();
+            //mesh.getMaterial().attach(0);
+            //mesh.drawVBO();
+            //mesh.loadVBO(true);
+            //mesh.renderVBO();
+            //mesh.getMaterial().detach();
 
             GlUtil.glPopMatrix();
+            //mesh.unloadVBO(true);
+
             GUIElement.disableOrthogonal();
             GlUtil.glEnable(GL11.GL_LIGHTING);
             GlUtil.glDisable(GL11.GL_NORMALIZE);
             GlUtil.glEnable(GL11.GL_DEPTH_TEST);
             GlUtil.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        }
+            //super.draw();
+        } else mesh.cleanUp();
     }
 
     public int getDisplayWidth() {

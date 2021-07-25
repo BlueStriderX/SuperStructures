@@ -5,7 +5,7 @@ import api.utils.game.PlayerUtils;
 import api.utils.gui.GUIMenuPanel;
 import api.utils.gui.SimplePopup;
 import org.schema.schine.graphicsengine.core.MouseEvent;
-import org.schema.schine.graphicsengine.forms.Mesh;
+import org.schema.schine.graphicsengine.core.settings.EngineSettings;
 import org.schema.schine.graphicsengine.forms.gui.GUIActivationCallback;
 import org.schema.schine.graphicsengine.forms.gui.GUICallback;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
@@ -19,10 +19,10 @@ import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.modules.dysonsphere.*;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
-import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
+import thederpgamer.superstructures.graphics.gui.elements.GUIDodecahedronMeshDrawer;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.DataUtils;
-import thederpgamer.superstructures.utils.DysonSphereUtils;
+import javax.vecmath.Vector3f;
 
 /**
  * <Description>
@@ -37,19 +37,12 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private GUIContentPane moduleTab;
     private GUIContentPane settingsTab;
 
-    private Mesh dysonSphereMesh;
-    private GUIMeshOverlay statusModel;
+    private GUIDodecahedronMeshDrawer meshDrawer;
     private GUITilePane<StructureModuleData> modulePane;
 
     public DysonSphereMenuPanel(InputState inputState, SuperStructureData structureData) {
         super(inputState, "DysonSphereMenuPanel", 800, 250);
         this.structureData = structureData;
-    }
-
-    @Override
-    public void onInit() {
-        this.dysonSphereMesh = DysonSphereUtils.createMesh(structureData);
-        super.onInit();
     }
 
     @Override
@@ -67,12 +60,25 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
         settingsTab = guiWindow.addTab("SETTINGS");
         settingsTab.setTextBoxHeightLast(500);
         createSettingsTab(settingsTab);
-    }
 
-    @Override
-    public void draw() {
-        super.draw();
-        if(guiWindow.getSelectedTab() == 0) statusModel.draw();
+        guiWindow.setCallback(new GUICallback() {
+            @Override
+            public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
+                if(guiWindow.getSelectedTab() == 0) {
+                    Vector3f rotation = new Vector3f();
+                    if(mouseEvent.pressedRightMouse() && mouseEvent.state) {
+                        rotation.x = -mouseEvent.x * (float) EngineSettings.M_MOUSE_SENSITIVITY.getCurrentState();
+                        rotation.y = mouseEvent.y * (float) EngineSettings.M_MOUSE_SENSITIVITY.getCurrentState();
+                    }
+                    meshDrawer.rotation.set(rotation);
+                }
+            }
+
+            @Override
+            public boolean isOccluded() {
+                return false;
+            }
+        });
     }
 
     public void refreshTabs() {
@@ -81,9 +87,8 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     }
 
     private void createStatusTab(GUIContentPane statusTab) {
-        statusModel = new GUIMeshOverlay(getState(), dysonSphereMesh, statusTab, (int) statusTab.getWidth() / 4, (int) statusTab.getHeight() / 4, 5.0f);
-        statusModel.onInit();
-        statusTab.getContent(0).attach(statusModel);
+        meshDrawer = new GUIDodecahedronMeshDrawer(getState(), 150.0f, statusTab);
+        statusTab.getContent(0).attach(meshDrawer);
     }
 
     private void createModuleTab(GUIContentPane moduleTab) {
