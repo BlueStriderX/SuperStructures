@@ -1,22 +1,22 @@
 package thederpgamer.superstructures.graphics.gui.elements;
 
 import com.bulletphysics.linearmath.Transform;
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.util.vector.Matrix4f;
+import org.schema.game.client.data.GameClientState;
 import org.schema.schine.graphicsengine.core.Controller;
+import org.schema.schine.graphicsengine.core.DrawableScene;
 import org.schema.schine.graphicsengine.core.GlUtil;
+import org.schema.schine.graphicsengine.core.Timer;
 import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import org.schema.schine.graphicsengine.forms.gui.GUIOverlay;
+import org.schema.schine.graphicsengine.shader.Shader;
+import org.schema.schine.graphicsengine.shader.ShaderLibrary;
+import org.schema.schine.graphicsengine.shader.Shaderable;
 import org.schema.schine.graphicsengine.texture.TextureLoader;
 import org.schema.schine.input.InputState;
-
 import javax.vecmath.Vector3f;
-import java.lang.reflect.Field;
-import java.nio.FloatBuffer;
 
 /**
  * <Description>
@@ -24,18 +24,16 @@ import java.nio.FloatBuffer;
  * @author TheDerpGamer
  * @since 07/24/2021
  */
-public class GUIMeshOverlay extends GUIOverlay {
+public class GUIMeshOverlay extends GUIOverlay implements Shaderable {
 
-    private Mesh mesh;
-    private GUIElement dependent;
+    private final Mesh mesh;
+    private final GUIElement dependent;
     private int displayWidth;
     private int spriteHeight;
     private float displayScale;
+    private float time;
     private boolean initialized = false;
-
-    private Transform transform;
-    private FloatBuffer fb = BufferUtils.createFloatBuffer(16);
-    private float[] ff = new float[16];
+    private Vector3f rotation;
 
     public GUIMeshOverlay(InputState state, Mesh mesh, GUIElement dependent, int displayWidth, int displayHeight, float displayScale) {
         super(new Sprite(displayWidth, displayHeight), state);
@@ -44,6 +42,7 @@ public class GUIMeshOverlay extends GUIOverlay {
         this.displayWidth = displayWidth;
         this.spriteHeight = displayHeight;
         this.displayScale = displayScale;
+        this.rotation = new Vector3f();
     }
 
     @Override
@@ -52,7 +51,7 @@ public class GUIMeshOverlay extends GUIOverlay {
         sprite.setHeight(displayWidth);
         sprite.setWidth(spriteHeight);
         sprite.onInit();
-        transform = new Transform();
+        rotation = new Vector3f();
         initialized = true;
     }
 
@@ -60,47 +59,32 @@ public class GUIMeshOverlay extends GUIOverlay {
     public void draw() {
         if(!initialized) onInit();
         if(dependent.isActive() && dependent.isOnScreen()) {
-            Matrix4f modelViewMatrix = Controller.modelviewMatrix;
-            fb.rewind();
-            modelViewMatrix.store(fb);
-            fb.rewind();
-            fb.get(ff);
-            transform.setFromOpenGLMatrix(ff);
-            transform.origin.set(0, 0, 0);
+            Transform transform = new Transform();
+            transform.setIdentity();
 
-            GUIElement.enableOrthogonal3d();
+            GlUtil.glEnable(GL11.GL_DEPTH_TEST);
+            GlUtil.glDepthMask(true);
+
+            ShaderLibrary.scanlineShader.setShaderInterface(this);
+            ShaderLibrary.scanlineShader.load();
+
+            Vector3f menuPos = Controller.getCamera().getPos();
+            Vector3f posOnScreen = ((GameClientState) getState()).getScene().getWorldToScreenConverter().convert(menuPos, new Vector3f(), false);
+            transform.origin.set(posOnScreen);
+            transform.basis.rotX(rotation.x);
+            transform.basis.rotY(rotation.y);
+            transform.basis.rotZ(rotation.z);
+
+            mesh.loadVBO(true);
             GlUtil.glPushMatrix();
-            GlUtil.translateModelview(getSprite().getPos().x, getSprite().getPos().y, 0);
-            GlUtil.scaleModelview(displayScale, -displayScale, displayScale);
             GlUtil.glMultMatrix(transform);
-            GlUtil.glDisable(GL11.GL_LIGHTING);
-            GlUtil.glDisable(GL11.GL_DEPTH_TEST);
-            GlUtil.glEnable(GL11.GL_NORMALIZE);
-            GlUtil.glDisable(GL11.GL_CULL_FACE);
-            GlUtil.glEnable(GL11.GL_DEPTH_TEST);
 
-
-            mesh.updateBound();
-            mesh.setType(Mesh.TYPE_VERTEX_BUFFER_OBJ);
-            mesh.setDrawMode(GL11.GL_TRIANGLE_STRIP);
-            mesh.setLoaded(true);
-            mesh.setVisibility(1);
-            mesh.draw();
-            //mesh.getMaterial().attach(0);
-            //mesh.drawVBO();
-            //mesh.loadVBO(true);
-            //mesh.renderVBO();
-            //mesh.getMaterial().detach();
-
+            GlUtil.scaleModelview(displayScale, displayScale, displayScale);
+            mesh.renderVBO();
             GlUtil.glPopMatrix();
-            //mesh.unloadVBO(true);
 
-            GUIElement.disableOrthogonal();
-            GlUtil.glEnable(GL11.GL_LIGHTING);
-            GlUtil.glDisable(GL11.GL_NORMALIZE);
-            GlUtil.glEnable(GL11.GL_DEPTH_TEST);
-            GlUtil.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-            //super.draw();
+            mesh.unloadVBO(true);
+            ShaderLibrary.scanlineShader.unload();
         } else mesh.cleanUp();
     }
 
@@ -132,27 +116,33 @@ public class GUIMeshOverlay extends GUIOverlay {
         return mesh;
     }
 
-    public void moveMesh(Vector3f position) {
-        transform.origin.set(position);
-    }
-
-    public void moveMesh(float xPosition, float yPosition, float zPosition) {
-        moveMesh(new Vector3f(xPosition, yPosition, zPosition));
-    }
-
     public void rotateMesh(Vector3f rotation) {
         rotateMesh(rotation.x, rotation.y, rotation.z);
     }
 
     public void rotateMesh(float xRotation, float yRotation, float zRotation) {
-        transform.basis.rotX(xRotation);
-        transform.basis.rotY(yRotation);
-        transform.basis.rotZ(zRotation);
+        rotation.set(xRotation, yRotation, zRotation);
     }
 
-    private void setWireFrameField() throws NoSuchFieldException, IllegalAccessException {
-        Field wireFrameField = mesh.getClass().getDeclaredField("drawingWireframe");
-        wireFrameField.setAccessible(true);
-        wireFrameField.setBoolean(mesh, true);
+    @Override
+    public void update(Timer timer) {
+        time += timer.getDelta() * 2.0f;
+    }
+
+    @Override
+    public void updateShader(DrawableScene drawableScene) {
+
+    }
+
+    @Override
+    public void updateShaderParameters(Shader shader) {
+        GlUtil.updateShaderFloat(shader, "uTime", time);
+        GlUtil.updateShaderVector2f(shader, "uResolution", 20, 1000);
+        GlUtil.updateShaderInt(shader, "uDiffuseTexture", 0);
+    }
+
+    @Override
+    public void onExit() {
+
     }
 }

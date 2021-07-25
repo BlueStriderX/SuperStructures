@@ -19,7 +19,7 @@ import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.data.modules.dysonsphere.*;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
-import thederpgamer.superstructures.graphics.gui.elements.GUIDodecahedronMeshDrawer;
+import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.DataUtils;
 import javax.vecmath.Vector3f;
@@ -37,7 +37,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private GUIContentPane moduleTab;
     private GUIContentPane settingsTab;
 
-    private GUIDodecahedronMeshDrawer meshDrawer;
+    private GUIMeshOverlay statusMesh;
     private GUITilePane<StructureModuleData> modulePane;
 
     public DysonSphereMenuPanel(InputState inputState, SuperStructureData structureData) {
@@ -70,7 +70,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         rotation.x = -mouseEvent.x * (float) EngineSettings.M_MOUSE_SENSITIVITY.getCurrentState();
                         rotation.y = mouseEvent.y * (float) EngineSettings.M_MOUSE_SENSITIVITY.getCurrentState();
                     }
-                    meshDrawer.rotation.set(rotation);
+                    statusMesh.rotateMesh(rotation);
                 }
             }
 
@@ -87,8 +87,9 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     }
 
     private void createStatusTab(GUIContentPane statusTab) {
-        meshDrawer = new GUIDodecahedronMeshDrawer(getState(), 150.0f, statusTab);
-        statusTab.getContent(0).attach(meshDrawer);
+        statusMesh = new GUIMeshOverlay(getState(), ResourceManager.getMesh("dyson-sphere-full"), statusTab, 256, 256, 5.0f);
+        statusMesh.onInit();
+        statusTab.getContent(0).attach(statusMesh);
     }
 
     private void createModuleTab(GUIContentPane moduleTab) {

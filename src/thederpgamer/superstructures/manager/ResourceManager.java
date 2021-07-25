@@ -132,7 +132,8 @@ public class ResourceManager {
     }
 
     public static Mesh getMesh(String meshName) {
-        return meshMap.get(meshName);
+        //return meshMap.get(meshName);
+        return (Mesh) meshMap.get(meshName).getChilds().get(0);
     }
 
     private static Shape3D loadShape(String shapeName) throws Exception {
