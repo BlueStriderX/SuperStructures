@@ -8,7 +8,6 @@ import org.schema.schine.graphicsengine.forms.Sprite;
 import org.schema.schine.resource.ResourceLoader;
 import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.shapes.Shape3D;
-
 import javax.vecmath.Vector3f;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +25,7 @@ import java.util.Scanner;
 public class ResourceManager {
 
     private static final String[] textureNames = {
-
+            "dyson-sphere-frame-texture"
     };
 
     private static final String[] spriteNames = {
@@ -45,7 +44,7 @@ public class ResourceManager {
     };
 
     private static final String[] meshNames = {
-            "dyson-sphere-full"
+            "dyson_sphere_frame"
             /*
             "dyson-sphere-power-module",
             "dyson-sphere-resource-module",
@@ -107,7 +106,7 @@ public class ResourceManager {
                         loader.getMeshLoader().loadModMesh(instance, meshName, instance.getJarResource("thederpgamer/superstructures/resources/meshes/" + meshName + ".zip"), null);
                         Mesh mesh = loader.getMeshLoader().getModMesh(SuperStructures.getInstance(), meshName);
                         mesh.setFirstDraw(true);
-                        meshMap.put(meshName, mesh);
+                        meshMap.put(meshName.replace("_", "-"), mesh);
                     } catch(ResourceException | IOException exception) {
                         exception.printStackTrace();
                     }
@@ -132,7 +131,6 @@ public class ResourceManager {
     }
 
     public static Mesh getMesh(String meshName) {
-        //return meshMap.get(meshName);
         return (Mesh) meshMap.get(meshName).getChilds().get(0);
     }
 

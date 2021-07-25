@@ -4,8 +4,9 @@ import api.common.GameClient;
 import api.utils.game.PlayerUtils;
 import api.utils.gui.GUIMenuPanel;
 import api.utils.gui.SimplePopup;
+import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.MouseEvent;
-import org.schema.schine.graphicsengine.core.settings.EngineSettings;
+import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.gui.GUIActivationCallback;
 import org.schema.schine.graphicsengine.forms.gui.GUICallback;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
@@ -22,7 +23,6 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.DataUtils;
-import javax.vecmath.Vector3f;
 
 /**
  * <Description>
@@ -37,7 +37,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private GUIContentPane moduleTab;
     private GUIContentPane settingsTab;
 
-    private GUIMeshOverlay statusMesh;
     private GUITilePane<StructureModuleData> modulePane;
 
     public DysonSphereMenuPanel(InputState inputState, SuperStructureData structureData) {
@@ -60,25 +59,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
         settingsTab = guiWindow.addTab("SETTINGS");
         settingsTab.setTextBoxHeightLast(500);
         createSettingsTab(settingsTab);
-
-        guiWindow.setCallback(new GUICallback() {
-            @Override
-            public void callback(GUIElement guiElement, MouseEvent mouseEvent) {
-                if(guiWindow.getSelectedTab() == 0) {
-                    Vector3f rotation = new Vector3f();
-                    if(mouseEvent.pressedRightMouse() && mouseEvent.state) {
-                        rotation.x = -mouseEvent.x * (float) EngineSettings.M_MOUSE_SENSITIVITY.getCurrentState();
-                        rotation.y = mouseEvent.y * (float) EngineSettings.M_MOUSE_SENSITIVITY.getCurrentState();
-                    }
-                    statusMesh.rotateMesh(rotation);
-                }
-            }
-
-            @Override
-            public boolean isOccluded() {
-                return false;
-            }
-        });
     }
 
     public void refreshTabs() {
@@ -87,7 +67,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     }
 
     private void createStatusTab(GUIContentPane statusTab) {
-        statusMesh = new GUIMeshOverlay(getState(), ResourceManager.getMesh("dyson-sphere-full"), statusTab, 256, 256, 5.0f);
+        GUIMeshOverlay statusMesh = new GUIMeshOverlay(getState(), (Mesh) Controller.getResLoader().getMesh("Arrow").getChilds().get(0), guiWindow, 256, 256, 150.0f);
         statusMesh.onInit();
         statusTab.getContent(0).attach(statusMesh);
     }

@@ -1,19 +1,14 @@
 package thederpgamer.superstructures.graphics.gui.elements;
 
 import com.bulletphysics.linearmath.Transform;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-import org.schema.game.client.data.GameClientState;
-import org.schema.schine.graphicsengine.core.Controller;
-import org.schema.schine.graphicsengine.core.DrawableScene;
 import org.schema.schine.graphicsengine.core.GlUtil;
-import org.schema.schine.graphicsengine.core.Timer;
+import org.schema.schine.graphicsengine.core.settings.EngineSettings;
 import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.Sprite;
-import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import org.schema.schine.graphicsengine.forms.gui.GUIOverlay;
-import org.schema.schine.graphicsengine.shader.Shader;
-import org.schema.schine.graphicsengine.shader.ShaderLibrary;
-import org.schema.schine.graphicsengine.shader.Shaderable;
+import org.schema.schine.graphicsengine.forms.gui.newgui.GUIMainWindow;
 import org.schema.schine.graphicsengine.texture.TextureLoader;
 import org.schema.schine.input.InputState;
 import javax.vecmath.Vector3f;
@@ -24,32 +19,33 @@ import javax.vecmath.Vector3f;
  * @author TheDerpGamer
  * @since 07/24/2021
  */
-public class GUIMeshOverlay extends GUIOverlay implements Shaderable {
+public class GUIMeshOverlay extends GUIOverlay {
 
     private final Mesh mesh;
-    private final GUIElement dependent;
+    private final GUIMainWindow window;
     private int displayWidth;
-    private int spriteHeight;
+    private int displayHeight;
     private float displayScale;
-    private float time;
-    private boolean initialized = false;
     private Vector3f rotation;
+    private final float sensitivity;
+    private boolean initialized = false;
 
-    public GUIMeshOverlay(InputState state, Mesh mesh, GUIElement dependent, int displayWidth, int displayHeight, float displayScale) {
+    public GUIMeshOverlay(InputState state, Mesh mesh, GUIMainWindow window, int displayWidth, int displayHeight, float displayScale) {
         super(new Sprite(displayWidth, displayHeight), state);
         this.mesh = mesh;
-        this.dependent = dependent;
+        this.window = window;
         this.displayWidth = displayWidth;
-        this.spriteHeight = displayHeight;
+        this.displayHeight = displayHeight;
         this.displayScale = displayScale;
         this.rotation = new Vector3f();
+        this.sensitivity = (float) EngineSettings.M_MOUSE_SENSITIVITY.getCurrentState();
     }
 
     @Override
     public void onInit() {
-        sprite.getMaterial().setTexture(TextureLoader.getEmptyTexture(displayWidth, spriteHeight));
+        sprite.getMaterial().setTexture(TextureLoader.getEmptyTexture(displayWidth, displayHeight));
         sprite.setHeight(displayWidth);
-        sprite.setWidth(spriteHeight);
+        sprite.setWidth(displayHeight);
         sprite.onInit();
         rotation = new Vector3f();
         initialized = true;
@@ -58,34 +54,37 @@ public class GUIMeshOverlay extends GUIOverlay implements Shaderable {
     @Override
     public void draw() {
         if(!initialized) onInit();
-        if(dependent.isActive() && dependent.isOnScreen()) {
+        if(window.getSelectedTab() == 0) {
+            setMouseUpdateEnabled(true);
+            if(Mouse.getEventButton() == 1 && Mouse.getEventButtonState()) {
+                rotation.x += (-Mouse.getDX() * sensitivity) * 10;
+                rotation.y += (Mouse.getDY() * sensitivity) * 10;
+            }
+
             Transform transform = new Transform();
             transform.setIdentity();
+            transform.origin.x = window.getPos().x + (window.getInnerWidth() / 4.0f);
+            transform.origin.y = window.getPos().y + (window.getInnerHeigth() / 2.0f);
 
-            GlUtil.glEnable(GL11.GL_DEPTH_TEST);
-            GlUtil.glDepthMask(true);
-
-            ShaderLibrary.scanlineShader.setShaderInterface(this);
-            ShaderLibrary.scanlineShader.load();
-
-            Vector3f menuPos = Controller.getCamera().getPos();
-            Vector3f posOnScreen = ((GameClientState) getState()).getScene().getWorldToScreenConverter().convert(menuPos, new Vector3f(), false);
-            transform.origin.set(posOnScreen);
-            transform.basis.rotX(rotation.x);
-            transform.basis.rotY(rotation.y);
-            transform.basis.rotZ(rotation.z);
-
-            mesh.loadVBO(true);
             GlUtil.glPushMatrix();
             GlUtil.glMultMatrix(transform);
+            GlUtil.scaleModelview(displayScale, -displayScale, displayScale);
+            GlUtil.rotateModelview(rotation.x, rotation.y, rotation.z, 0.0f);
+            GlUtil.glEnable(GL11.GL_BLEND);
+            GlUtil.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlUtil.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlUtil.glEnable(GL11.GL_COLOR_MATERIAL);
+            mesh.draw();
 
-            GlUtil.scaleModelview(displayScale, displayScale, displayScale);
-            mesh.renderVBO();
             GlUtil.glPopMatrix();
-
-            mesh.unloadVBO(true);
-            ShaderLibrary.scanlineShader.unload();
-        } else mesh.cleanUp();
+            GlUtil.glDisable(GL11.GL_COLOR_MATERIAL);
+            GlUtil.glDisable(GL11.GL_BLEND);
+        } else {
+            mesh.cleanUp();
+            rotation.x = 0.0f;
+            rotation.y = 0.0f;
+            setMouseUpdateEnabled(false);
+        }
     }
 
     public int getDisplayWidth() {
@@ -96,12 +95,12 @@ public class GUIMeshOverlay extends GUIOverlay implements Shaderable {
         this.displayWidth = displayWidth;
     }
 
-    public int getSpriteHeight() {
-        return spriteHeight;
+    public int getDisplayHeight() {
+        return displayHeight;
     }
 
-    public void setSpriteHeight(int spriteHeight) {
-        this.spriteHeight = spriteHeight;
+    public void setDisplayHeight(int displayHeight) {
+        this.displayHeight = displayHeight;
     }
 
     public float getDisplayScale() {
@@ -114,35 +113,5 @@ public class GUIMeshOverlay extends GUIOverlay implements Shaderable {
 
     public Mesh getMesh() {
         return mesh;
-    }
-
-    public void rotateMesh(Vector3f rotation) {
-        rotateMesh(rotation.x, rotation.y, rotation.z);
-    }
-
-    public void rotateMesh(float xRotation, float yRotation, float zRotation) {
-        rotation.set(xRotation, yRotation, zRotation);
-    }
-
-    @Override
-    public void update(Timer timer) {
-        time += timer.getDelta() * 2.0f;
-    }
-
-    @Override
-    public void updateShader(DrawableScene drawableScene) {
-
-    }
-
-    @Override
-    public void updateShaderParameters(Shader shader) {
-        GlUtil.updateShaderFloat(shader, "uTime", time);
-        GlUtil.updateShaderVector2f(shader, "uResolution", 20, 1000);
-        GlUtil.updateShaderInt(shader, "uDiffuseTexture", 0);
-    }
-
-    @Override
-    public void onExit() {
-
     }
 }

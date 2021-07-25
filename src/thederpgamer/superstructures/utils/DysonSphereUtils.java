@@ -7,11 +7,8 @@ import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
 import org.schema.game.common.data.world.StellarSystem;
 import org.schema.game.server.data.ServerConfig;
-import org.schema.schine.graphicsengine.forms.Mesh;
 import thederpgamer.superstructures.data.structures.DysonSphereData;
-import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.manager.ConfigManager;
-import thederpgamer.superstructures.manager.ResourceManager;
 
 /**
  * <Description>
@@ -36,18 +33,5 @@ public class DysonSphereUtils {
 
     public static boolean isClientInDrawRange(float maxDistance) {
         return GameClient.getClientState().getCurrentGalaxy().getSunDistance(GameClient.getClientPlayerState().getCurrentSector()) <= maxDistance;
-    }
-
-    public static Mesh createMesh(SuperStructureData structureData) {
-        //Mesh[] meshArray = new Mesh[12];
-        for(int i = 0; i < 12; i ++) {
-            try {
-                //meshArray[i] = ResourceManager.getMesh(structureData.modules[i].getMeshName());
-            } catch(Exception exception) {
-                exception.printStackTrace();
-            }
-        }
-        //Mesh combinedMesh =
-        return ResourceManager.getMesh( "dyson-sphere-full"); //Todo: Combine each individual module mesh into one combined mesh
     }
 }
