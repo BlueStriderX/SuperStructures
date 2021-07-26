@@ -4,9 +4,7 @@ import api.common.GameClient;
 import api.utils.game.PlayerUtils;
 import api.utils.gui.GUIMenuPanel;
 import api.utils.gui.SimplePopup;
-import org.schema.schine.graphicsengine.core.Controller;
 import org.schema.schine.graphicsengine.core.MouseEvent;
-import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.forms.gui.GUIActivationCallback;
 import org.schema.schine.graphicsengine.forms.gui.GUICallback;
 import org.schema.schine.graphicsengine.forms.gui.GUIElement;
@@ -67,7 +65,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     }
 
     private void createStatusTab(GUIContentPane statusTab) {
-        GUIMeshOverlay statusMesh = new GUIMeshOverlay(getState(), (Mesh) Controller.getResLoader().getMesh("Arrow").getChilds().get(0), guiWindow, 256, 256, 150.0f);
+        GUIMeshOverlay statusMesh = new GUIMeshOverlay(getState(), ResourceManager.getMesh("dyson-sphere-frame"), guiWindow, 256, 256, 130.0f);
         statusMesh.onInit();
         statusTab.getContent(0).attach(statusMesh);
     }

@@ -9,6 +9,7 @@ import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
 import api.listener.events.input.KeyPressEvent;
+import api.listener.events.input.MousePressEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
@@ -25,6 +26,7 @@ import thederpgamer.superstructures.elements.blocks.systems.DysonSphereControlle
 import thederpgamer.superstructures.graphics.drawer.DysonSphereOutlineDrawer;
 import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereControlManager;
 import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereMenuPanel;
+import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
 import thederpgamer.superstructures.manager.ConfigManager;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.systems.dysonsphere.DysonSphereManagerModule;
@@ -77,6 +79,13 @@ public class SuperStructures extends StarMod {
     }
 
     private void registerListeners() {
+        StarLoader.registerListener(MousePressEvent.class, new Listener<MousePressEvent>() {
+            @Override
+            public void onEvent(MousePressEvent event) {
+                GUIMeshOverlay.rotateMesh(event.getRawEvent());
+            }
+        }, this);
+
         StarLoader.registerListener(KeyPressEvent.class, new Listener<KeyPressEvent>() {
             @Override
             public void onEvent(KeyPressEvent event) {
