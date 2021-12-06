@@ -4,6 +4,7 @@ import api.common.GameClient;
 import api.utils.game.PlayerUtils;
 import api.utils.gui.GUIMenuPanel;
 import api.utils.gui.SimplePopup;
+import org.schema.schine.graphicsengine.core.GLFrame;
 import org.schema.schine.graphicsengine.core.MouseEvent;
 import org.schema.schine.graphicsengine.forms.gui.GUIActivationCallback;
 import org.schema.schine.graphicsengine.forms.gui.GUICallback;
@@ -21,6 +22,7 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.DataUtils;
+import thederpgamer.superstructures.utils.DysonSphereUtils;
 
 /**
  * <Description>
@@ -35,45 +37,65 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private GUIContentPane moduleTab;
     private GUIContentPane settingsTab;
 
+    private GUIMeshOverlay statusMesh;
     private GUITilePane<StructureModuleData> modulePane;
 
+    private boolean initialized = false;
+
     public DysonSphereMenuPanel(InputState inputState, SuperStructureData structureData) {
-        super(inputState, "DysonSphereMenuPanel", 800, 250);
+        super(inputState, "DysonSphereMenuPanel", (int) (GLFrame.getWidth() / 1.5f), (int) (GLFrame.getHeight() / 1.5f));
         this.structureData = structureData;
     }
 
     @Override
+    public void onInit() {
+        super.onInit();
+        initialized = true;
+    }
+
+    @Override
+    public void draw() {
+        if(!initialized) onInit();
+        if(guiWindow.getSelectedTab() == 0) statusMesh.drawMesh = true;
+        super.draw();
+    }
+    
+    @Override
     public void recreateTabs() {
+        int tab = guiWindow.getSelectedTab();
         guiWindow.clearTabs();
 
         statusTab = guiWindow.addTab("STATUS");
-        statusTab.setTextBoxHeightLast(500);
+        statusTab.setTextBoxHeightLast((int) (GLFrame.getHeight() / 1.5f));
         createStatusTab(statusTab);
 
         moduleTab = guiWindow.addTab("MODULES");
-        moduleTab.setTextBoxHeightLast(500);
+        moduleTab.setTextBoxHeightLast((int) (GLFrame.getHeight() / 1.5f));
         createModuleTab(moduleTab);
 
         settingsTab = guiWindow.addTab("SETTINGS");
-        settingsTab.setTextBoxHeightLast(500);
+        settingsTab.setTextBoxHeightLast((int) (GLFrame.getHeight() / 1.5f));
         createSettingsTab(settingsTab);
+
+        guiWindow.setSelectedTab(tab);
     }
 
     public void refreshTabs() {
         modulePane.clear();
         for(int i = 0; i < structureData.modules.length; i ++) createModuleTile(modulePane, i);
+        DysonSphereUtils.updateMesh(statusMesh, structureData);
     }
 
     private void createStatusTab(GUIContentPane statusTab) {
-        GUIMeshOverlay statusMesh = new GUIMeshOverlay(getState(), ResourceManager.getMesh("dyson-sphere-frame"), guiWindow, 256, 256, 130.0f);
-        statusMesh.onInit();
+        (statusMesh = new GUIMeshOverlay(getState(), DysonSphereUtils.createMultiMesh(structureData), guiWindow, 130.0f)).onInit();
         statusTab.getContent(0).attach(statusMesh);
+        statusMesh.getPos().y -= 50;
     }
 
     private void createModuleTab(GUIContentPane moduleTab) {
         modulePane = new GUITilePane<>(getState(), guiWindow, 132, 180);
         modulePane.onInit();
-        for(int i = 0; i < structureData.modules.length; i ++) createModuleTile(modulePane, i);
+        if(structureData != null && structureData.modules != null) for(int i = 0; i < structureData.modules.length; i ++) createModuleTile(modulePane, i);
         moduleTab.getContent(0).attach(modulePane);
     }
 

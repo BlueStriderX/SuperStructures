@@ -8,25 +8,20 @@ import api.listener.events.block.SegmentPieceAddByMetadataEvent;
 import api.listener.events.block.SegmentPieceAddEvent;
 import api.listener.events.block.SegmentPieceRemoveEvent;
 import api.listener.events.draw.RegisterWorldDrawersEvent;
-import api.listener.events.input.KeyPressEvent;
-import api.listener.events.input.MousePressEvent;
 import api.listener.events.register.ManagerContainerRegisterEvent;
 import api.mod.StarLoader;
 import api.mod.StarMod;
 import api.utils.StarRunnable;
 import api.utils.gui.ModGUIHandler;
 import api.utils.gui.SimplePopup;
-import org.lwjgl.input.Keyboard;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.schine.resource.ResourceLoader;
-import thederpgamer.superstructures.data.shapes.Shape3D;
 import thederpgamer.superstructures.elements.ElementManager;
 import thederpgamer.superstructures.elements.blocks.systems.DysonSphereController;
-import thederpgamer.superstructures.graphics.drawer.DysonSphereOutlineDrawer;
+import thederpgamer.superstructures.graphics.drawer.DysonSphereDrawer;
 import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereControlManager;
 import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereMenuPanel;
-import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
 import thederpgamer.superstructures.manager.ConfigManager;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.systems.dysonsphere.DysonSphereManagerModule;
@@ -49,13 +44,13 @@ public class SuperStructures extends StarMod {
     public static void main(String[] args) {
 
     }
-    public SuperStructures() {
-
-    }
+    public SuperStructures() { }
 
     //Data
     public DysonSphereControlManager dysonSphereControlManager;
-    public DysonSphereOutlineDrawer dysonSphereOutlineDrawer;
+
+    //Drawers
+    public DysonSphereDrawer dysonSphereDrawer;
 
     @Override
     public void onEnable() {
@@ -79,35 +74,10 @@ public class SuperStructures extends StarMod {
     }
 
     private void registerListeners() {
-        StarLoader.registerListener(MousePressEvent.class, new Listener<MousePressEvent>() {
-            @Override
-            public void onEvent(MousePressEvent event) {
-                GUIMeshOverlay.rotateMesh(event.getRawEvent());
-            }
-        }, this);
-
-        StarLoader.registerListener(KeyPressEvent.class, new Listener<KeyPressEvent>() {
-            @Override
-            public void onEvent(KeyPressEvent event) {
-                if(!GameClient.getClientState().getGlobalGameControlManager().getIngameControlManager().isAnyMenuOrChatActive() && event.isKeyDown() && event.getRawEvent().getKey() == Keyboard.KEY_EQUALS && ConfigManager.getMainConfig().getBoolean("debug-mode")) {
-                    int drawMode = dysonSphereOutlineDrawer.outlineShape.getDrawMode();
-                    switch(drawMode) {
-                        case Shape3D.NONE:
-                            GameClient.getClientPlayerState().getWordTransform(dysonSphereOutlineDrawer.outlineShape.getTransform());
-                            dysonSphereOutlineDrawer.outlineShape.setDrawMode(Shape3D.WIREFRAME);
-                            break;
-                        case Shape3D.WIREFRAME:
-                            dysonSphereOutlineDrawer.outlineShape.setDrawMode(Shape3D.NONE);
-                            break;
-                    }
-                }
-            }
-        }, this);
-
         StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
             @Override
             public void onEvent(RegisterWorldDrawersEvent event) {
-                event.getModDrawables().add(dysonSphereOutlineDrawer = new DysonSphereOutlineDrawer());
+                event.getModDrawables().add(dysonSphereDrawer = new DysonSphereDrawer());
             }
         }, this);
 
@@ -123,7 +93,7 @@ public class SuperStructures extends StarMod {
             public void onEvent(SegmentPieceActivateByPlayer event) {
                 SegmentPiece segmentPiece = event.getSegmentPiece();
                 if(segmentPiece.getInfo().getId() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
-                    if(DysonSphereUtils.isValidForDysonSphere(segmentPiece) || DataUtils.adminMode()) {
+                    if(DysonSphereUtils.isValidForDysonSphere(segmentPiece) || DataUtils.adminMode() || true) {
                         if(dysonSphereControlManager == null) {
                             dysonSphereControlManager = new DysonSphereControlManager();
                             ModGUIHandler.registerNewControlManager(getSkeleton(), dysonSphereControlManager);
