@@ -1,7 +1,10 @@
 package thederpgamer.superstructures.data.modules;
 
-import thederpgamer.superstructures.data.structures.SuperStructureData;
-import java.io.Serializable;
+import api.network.PacketReadBuffer;
+import api.network.PacketWriteBuffer;
+import thederpgamer.superstructures.data.DataSerializer;
+
+import java.io.IOException;
 import java.util.HashMap;
 
 /**
@@ -10,7 +13,7 @@ import java.util.HashMap;
  * @author TheDerpGamer
  * @since 07/21/2021
  */
-public class StructureModuleData implements Serializable {
+public class StructureModuleData implements DataSerializer {
 
     public static final int NONE = 0;
     public static final int CONSTRUCTION = 1;
@@ -19,29 +22,50 @@ public class StructureModuleData implements Serializable {
 
     public String name;
     public int level;
-    public final int maxLevel;
+    public int maxLevel;
     public short[] blockIds;
-    public int moduleEntityId;
-    public int controllerEntityId;
     public int status;
     public HashMap<Short, Integer> constructionMap;
 
-    public StructureModuleData(String name, int maxLevel, int blockTypeCount, SuperStructureData structureData) {
+    public StructureModuleData(String name, int maxLevel, int blockTypeCount) {
         this.name = name;
-        this.moduleEntityId = -1;
         this.maxLevel = maxLevel;
         this.level = 0;
         this.blockIds = new short[blockTypeCount];
-        this.controllerEntityId = structureData.entityId;
         this.constructionMap = new HashMap<>();
         this.status = NONE;
+    }
+
+    public StructureModuleData(PacketReadBuffer packetReadBuffer) throws IOException {
+        deserialize(packetReadBuffer);
     }
 
     public String getDesc() {
         return "";
     }
 
-    public String getMeshName() {
-        return name.toLowerCase().replace(" ", "_");
+    @Override
+    public void serialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
+        packetWriteBuffer.writeString(name);
+        packetWriteBuffer.writeInt(level);
+        packetWriteBuffer.writeInt(maxLevel);
+        packetWriteBuffer.writeInt(blockIds.length);
+        if(blockIds.length > 0) for(short s : blockIds) packetWriteBuffer.writeShort(s);
+        packetWriteBuffer.writeInt(status);
+        packetWriteBuffer.writeObject(constructionMap);
+    }
+
+    @Override
+    public void deserialize(PacketReadBuffer packetReadBuffer) throws IOException {
+        name = packetReadBuffer.readString();
+        level = packetReadBuffer.readInt();
+        maxLevel = packetReadBuffer.readInt();
+        int size = packetReadBuffer.readInt();
+        if(size > 0) {
+            blockIds = new short[size];
+            for(int i = 0; i < size; i ++) blockIds[i] = packetReadBuffer.readShort();
+        }
+        status = packetReadBuffer.readInt();
+        constructionMap = packetReadBuffer.readObject(constructionMap.getClass());
     }
 }

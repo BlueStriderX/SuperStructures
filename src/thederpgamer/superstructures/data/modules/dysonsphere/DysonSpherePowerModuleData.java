@@ -12,6 +12,6 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
 public class DysonSpherePowerModuleData extends StructureModuleData {
 
     public DysonSpherePowerModuleData(SuperStructureData structureData) {
-        super("Dyson Sphere Power Module", 5, 6, structureData);
+        super("Dyson Sphere Power Module", 5, 6);
     }
 }

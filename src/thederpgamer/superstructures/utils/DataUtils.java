@@ -1,24 +1,9 @@
 package thederpgamer.superstructures.utils;
 
 import api.common.GameClient;
-import api.common.GameServer;
 import api.mod.ModSkeleton;
-import api.mod.config.PersistentObjectUtil;
-import org.schema.common.util.linAlg.Vector3i;
-import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.world.Sector;
-import org.schema.game.common.data.world.StellarSystem;
-import org.schema.game.common.data.world.VoidSystem;
 import thederpgamer.superstructures.SuperStructures;
-import thederpgamer.superstructures.data.structures.DysonSphereData;
-import thederpgamer.superstructures.data.structures.SuperStructureData;
-import thederpgamer.superstructures.elements.ElementManager;
 import thederpgamer.superstructures.manager.ConfigManager;
-
-import java.io.IOException;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * <Description>
@@ -28,20 +13,13 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class DataUtils {
 
+    /*
     public static final int CREATE = 0;
     public static final int UPDATE = 1;
     public static final int REMOVE = 2;
+     */
 
     private static final ModSkeleton instance = SuperStructures.getInstance().getSkeleton();
-    private static final ConcurrentHashMap<Vector3i, SuperStructureData> superStructureMap = new ConcurrentHashMap<>();
-    private static final ConcurrentLinkedQueue<Integer[]> updateQueue = new ConcurrentLinkedQueue<>();
-
-    public static void initialize() {
-        for(Object obj : PersistentObjectUtil.getObjects(instance, SuperStructureData.class)) {
-            SuperStructureData structureData = (SuperStructureData) obj;
-            superStructureMap.put(structureData.systemPos, structureData);
-        }
-    }
 
     /* Can't use input streams >:(
     public static BlueprintEntry getModuleBp(StructureModuleData moduleData) {
@@ -56,6 +34,7 @@ public class DataUtils {
         return BluePrintController.active.importFile(SuperStructures.getInstance().getJarResource("thederpgamer/superstructures/resources/blueprints/dysonsphere/" + moduleType + ".sment"), null).get(0);
     }
      */
+    /*
 
     public static void saveData() {
         updateStructureMap();
@@ -120,25 +99,15 @@ public class DataUtils {
     }
 
     public static void queueUpdate(SuperStructureData structureData) {
-        updateQueue.add(new Integer[] {UPDATE, structureData.systemPos.x, structureData.systemPos.y, structureData.systemPos.z});
+        updateQueue.add(new Integer[] {UPDATE, structureData.system.x, structureData.system.y, structureData.system.z});
     }
 
     public static void queueRemoval(Vector3i systemPos) {
         updateQueue.add(new Integer[] {REMOVE, systemPos.x, systemPos.y, systemPos.z});
     }
+     */
 
     public static boolean adminMode() {
         return ConfigManager.getMainConfig().getBoolean("debug-mode") && GameClient.getClientPlayerState().isAdmin() && GameClient.getClientPlayerState().isCreativeModeEnabled();
-    }
-
-    private static SuperStructureData generateStructureData(SegmentPiece segmentPiece) {
-        if(segmentPiece.getInfo().getId() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
-            try {
-                return new DysonSphereData(GameServer.getUniverse().getSector(VoidSystem.getSunSectorPosAbs(GameClient.getClientState().getCurrentGalaxy(), segmentPiece.getSegmentController().getSystem(new Vector3i()), new Vector3i())), segmentPiece);
-            } catch(IOException exception) {
-                exception.printStackTrace();
-            }
-        }
-        return null;
     }
 }

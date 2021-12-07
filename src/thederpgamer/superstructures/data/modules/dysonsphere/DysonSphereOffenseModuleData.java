@@ -12,6 +12,6 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
 public class DysonSphereOffenseModuleData extends StructureModuleData {
 
     public DysonSphereOffenseModuleData(SuperStructureData structureData) {
-        super("Dyson Sphere Offense Module", 5, 6, structureData);
+        super("Dyson Sphere Offense Module", 5, 6);
     }
 }

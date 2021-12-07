@@ -168,7 +168,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
                         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -212,7 +211,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
                         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -256,7 +254,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
                         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -300,7 +297,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
                         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -344,7 +340,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
                         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -388,7 +383,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
                         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -432,7 +426,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         module[0].status = StructureModuleData.NONE;
                         structureData.modules[index] = module[0];
                         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-                        DataUtils.queueUpdate(structureData);
                     }
                 }
 
@@ -477,6 +470,5 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
         }
         structureData.modules[index] = moduleData;
         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-        DataUtils.queueUpdate(structureData);
     }
 }

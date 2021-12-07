@@ -12,7 +12,7 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
 public class DysonSphereDefenseModuleData extends StructureModuleData {
 
     public DysonSphereDefenseModuleData(SuperStructureData structureData) {
-        super("Dyson Sphere Defense Module", 5, 6, structureData);
+        super("Dyson Sphere Defense Module", 5, 6);
     }
 
     /* Todo: Display module status and info

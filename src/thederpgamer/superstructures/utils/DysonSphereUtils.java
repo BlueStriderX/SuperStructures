@@ -2,10 +2,11 @@ package thederpgamer.superstructures.utils;
 
 import api.common.GameClient;
 import api.common.GameServer;
+import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.world.Sector;
 import org.schema.game.common.data.world.SimpleTransformableSendableObject;
-import org.schema.game.common.data.world.StellarSystem;
+import org.schema.game.common.data.world.VoidSystem;
 import org.schema.game.server.data.ServerConfig;
 import org.schema.schine.graphicsengine.forms.Mesh;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
@@ -30,6 +31,11 @@ public class DysonSphereUtils {
         return ((sector._getDistanceToSun() * (int) ServerConfig.SECTOR_SIZE.getCurrentState()) <= (ConfigManager.getMainConfig().getDouble("max-dyson-sphere-station-distance"))) && segmentPiece.getSegmentController().getType().equals(SimpleTransformableSendableObject.EntityType.SPACE_STATION);
     }
 
+    public static boolean inDrawRange() {
+        return GameClient.getClientState().getCurrentGalaxy().getSunDistance(GameClient.getClientPlayerState().getCurrentSector()) <= ConfigManager.getMainConfig().getInt("max-dyson-sphere-station-distance");
+    }
+
+    /*
     public static boolean hasDysonSphere(StellarSystem system) {
         if(DataUtils.hasSuperStructure(system) && DataUtils.getStructure(system) instanceof DysonSphereData) return true;
         else {
@@ -40,6 +46,12 @@ public class DysonSphereUtils {
 
     public static boolean isClientInDrawRange(float maxDistance) {
         return GameClient.getClientState().getCurrentGalaxy().getSunDistance(GameClient.getClientPlayerState().getCurrentSector()) <= maxDistance;
+    }
+
+     */
+
+    public static DysonSphereData generateStructureData(SegmentPiece segmentPiece) {
+        return new DysonSphereData(VoidSystem.getSunSectorPosAbs(GameClient.getClientState().getCurrentGalaxy(), segmentPiece.getSegmentController().getSystem(new Vector3i()), new Vector3i()), segmentPiece);
     }
 
     public static DysonSphereMultiMesh createMultiMesh(SuperStructureData structureData) {

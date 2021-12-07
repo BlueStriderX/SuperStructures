@@ -12,6 +12,6 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
 public class DysonSphereEmptyModuleData extends StructureModuleData {
 
     public DysonSphereEmptyModuleData(SuperStructureData structureData) {
-        super("Dyson Sphere Module Frame", 0, 1, structureData);
+        super("Dyson Sphere Module Frame", 0, 1);
     }
 }

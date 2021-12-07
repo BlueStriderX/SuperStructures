@@ -1,11 +1,9 @@
 package thederpgamer.superstructures.graphics.mesh;
 
 import org.lwjgl.input.Mouse;
-import org.schema.common.util.linAlg.Quat4fTools;
 import org.schema.schine.graphicsengine.core.GlUtil;
 import org.schema.schine.graphicsengine.forms.Mesh;
 
-import javax.vecmath.Matrix3f;
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
 import javax.vecmath.Vector4f;
@@ -20,14 +18,11 @@ public class DysonSphereMultiMesh extends MultiMesh {
 
     private final Vector3f lastMousePos = new Vector3f();
     private final Vector3f mouseRotation = new Vector3f();
-    
-    private final Matrix3f horizontalMatrix = new Matrix3f();
-    private final Matrix3f verticalMatrix = new Matrix3f();
 
-    private final Quat4f horizontalRotation = new Quat4f();
-    private final Quat4f verticalRotation = new Quat4f();
-    private final Quat4f finalRotation = new Quat4f();
-    private final Vector4f finalVectorRotation = new Vector4f();
+    private final Quat4f currentRotation = new Quat4f();
+    private final Quat4f quatRotation = new Quat4f();
+    private final Vector4f vectorRotation = new Vector4f();
+    private final Vector4f finalRotation = new Vector4f();
 
     private boolean initialized = false;
 
@@ -51,19 +46,14 @@ public class DysonSphereMultiMesh extends MultiMesh {
         lastMousePos.x = Mouse.getEventX();
         lastMousePos.y = Mouse.getEventY();
 
-        horizontalMatrix.setIdentity();
-        horizontalMatrix.rotY(-mouseRotation.x * 0.0065f);
+        float magnitude = (float) (Math.sqrt(mouseRotation.x * mouseRotation.x + mouseRotation.y * mouseRotation.y) * 0.01f);
+        vectorRotation.set(mouseRotation.y, -mouseRotation.x, 0.0f, magnitude);
+        quatRotation.set(vectorRotation); //Convert to Quat4f
+        currentRotation.set(getRot4()); //Get current rotation
 
-        verticalMatrix.setIdentity();
-        verticalMatrix.rotX(mouseRotation.y * 0.0065f);
-
-        Quat4fTools.set(horizontalMatrix, horizontalRotation);
-        //Quat4fTools.set(verticalMatrix, verticalRotation);
-
-        //finalRotation.set(0.0f, 0.0f, 0.0f, 0.0f);
-        //finalRotation.mul(horizontalRotation, verticalRotation);
-        finalVectorRotation.set(horizontalRotation);
-        setQuatRot(finalVectorRotation);
+        quatRotation.mul(currentRotation); //Apply current rotation
+        finalRotation.set(quatRotation); //Convert to Vector4f
+        setQuatRot(finalRotation); //Set rotation
 
         GlUtil.enableBlend(true);
         if(frame != null) frame.draw();

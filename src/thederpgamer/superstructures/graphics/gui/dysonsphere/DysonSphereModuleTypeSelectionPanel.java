@@ -300,6 +300,5 @@ public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
         moduleData.level = 1;
         structureData.modules[index] = moduleData;
         ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
-        DataUtils.queueUpdate(structureData);
     }
 }
