@@ -77,9 +77,9 @@ public class ResourceManager {
                 for(String textureName : textureNames) {
                     try {
                         if(textureName.endsWith("icon")) {
-                            textureMap.put(textureName, StarLoaderTexture.newIconTexture(instance.getJarBufferedImage("thederpgamer/superstructures/resources/textures/" + textureName + ".png")));
+                            textureMap.put(textureName, StarLoaderTexture.newIconTexture(instance.getJarBufferedImage("/textures/" + textureName + ".png")));
                         } else {
-                            textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("thederpgamer/superstructures/resources/textures/" + textureName + ".png")));
+                            textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("/textures/" + textureName + ".png")));
                         }
                     } catch(Exception exception) {
                         //LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
@@ -89,7 +89,7 @@ public class ResourceManager {
                 //Load Sprites
                 for(String spriteName : spriteNames) {
                     try {
-                        Sprite sprite = StarLoaderTexture.newSprite(instance.getJarBufferedImage("thederpgamer/superstructures/resources/sprites/" + spriteName + ".png"), instance, spriteName);
+                        Sprite sprite = StarLoaderTexture.newSprite(instance.getJarBufferedImage("/sprites/" + spriteName + ".png"), instance, spriteName);
                         sprite.setPositionCenter(false);
                         sprite.setName(spriteName);
                         spriteMap.put(spriteName, sprite);
@@ -101,7 +101,7 @@ public class ResourceManager {
                 //Load meshes
                 for(String meshName : meshNames) {
                     try {
-                        loader.getMeshLoader().loadModMesh(instance, meshName, instance.getJarResource("thederpgamer/superstructures/resources/meshes/" + meshName + ".zip"), null);
+                        loader.getMeshLoader().loadModMesh(instance, meshName, instance.getJarResource("/meshes/" + meshName + ".zip"), null);
                         Mesh mesh = loader.getMeshLoader().getModMesh(SuperStructures.getInstance(), meshName);
                         mesh.setFirstDraw(true);
                         meshMap.put(meshName, mesh);

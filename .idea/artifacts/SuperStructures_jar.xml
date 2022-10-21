@@ -4,7 +4,7 @@
     <root id="root">
       <element id="archive" name="SuperStructures.jar">
         <element id="module-output" name="SuperStructures" />
-        <element id="file-copy" path="$PROJECT_DIR$/src/mod.json" />
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/mod.json" />
       </element>
     </root>
   </artifact>
