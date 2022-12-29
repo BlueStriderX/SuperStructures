@@ -2,6 +2,7 @@ package thederpgamer.superstructures.utils;
 
 import api.common.GameClient;
 import api.common.GameServer;
+import com.bulletphysics.linearmath.MatrixUtil;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.world.Sector;
@@ -17,6 +18,11 @@ import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
 import thederpgamer.superstructures.graphics.mesh.DysonSphereMultiMesh;
 import thederpgamer.superstructures.manager.ConfigManager;
 import thederpgamer.superstructures.manager.ResourceManager;
+
+import javax.vecmath.Matrix3f;
+import javax.vecmath.Vector3f;
+
+import static thederpgamer.superstructures.data.structures.DysonSphereData.getDodecahedronVertex;
 
 /**
  * <Description>
@@ -51,14 +57,28 @@ public class DysonSphereUtils {
      */
 
     public static DysonSphereData generateStructureData(SegmentPiece segmentPiece) {
-        return new DysonSphereData(VoidSystem.getSunSectorPosAbs(GameClient.getClientState().getCurrentGalaxy(), segmentPiece.getSegmentController().getSystem(new Vector3i()), new Vector3i()), segmentPiece);
+        return new DysonSphereData(VoidSystem.getSunSectorPosAbs(GameServer.getUniverse().getGalaxy(new Vector3i()), segmentPiece.getSegmentController().getSystem(new Vector3i()), new Vector3i()), segmentPiece);
     }
 
-    public static DysonSphereMultiMesh createMultiMesh(SuperStructureData structureData) {
+    public static DysonSphereMultiMesh createMultiMesh(SuperStructureData structureData, float scale) {
         Mesh[] meshArray = new Mesh[12];
         for(int i = 0; i < meshArray.length; i ++) {
             try {
-                meshArray[i] = ResourceManager.getMesh("dyson_sphere_empty_module_" + i);
+                meshArray[i] = ResourceManager.getMesh("dyson_sphere_empty_module_0");
+                //Rotate mesh to face outwards from the center of the mesh
+                Vector3f direction = new Vector3f(meshArray[i].getTransform().origin);
+                direction.normalize();
+                //Create new matrix3f to store rotation
+                Matrix3f rotation = new Matrix3f();
+                rotation.setIdentity();
+                MatrixUtil.setEulerZYX(rotation, (float) Math.PI / 2.0f, (float) Math.PI / 2.0f, 0.0f);
+                //Rotate the mesh
+                meshArray[i].getTransform().basis.mul(rotation);
+
+                //Position the mesh so it acts as a face of the dodechahedron
+                meshArray[i].getTransform().origin.set(0.0f, 0.0f, 0.0f);
+                meshArray[i].getTransform().origin.scaleAdd(scale, getDodecahedronVertex(i), meshArray[i].getTransform().origin);
+
             } catch(Exception ignored) { }
         }
         return new DysonSphereMultiMesh(ResourceManager.getMesh("dyson_sphere_frame"), meshArray);

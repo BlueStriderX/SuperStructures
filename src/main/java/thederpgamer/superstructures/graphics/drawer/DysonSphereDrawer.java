@@ -1,6 +1,8 @@
 package thederpgamer.superstructures.graphics.drawer;
 
 import api.utils.draw.ModWorldDrawer;
+import org.schema.common.util.linAlg.Vector3i;
+import org.schema.game.common.data.player.PlayerState;
 import org.schema.schine.graphicsengine.core.Timer;
 import thederpgamer.superstructures.data.structures.DysonSphereData;
 
@@ -55,4 +57,18 @@ public class DysonSphereDrawer extends ModWorldDrawer {
             drawMap.remove(abs);
         }
     }
+
+	public DysonSphereData getNearestDysonSphere(PlayerState sender) {
+        Vector3i senderPos = sender.getCurrentSector();
+        DysonSphereData nearest = null;
+        double distance = 0;
+        for(DysonSphereData data : drawMap.values()) {
+            double dist = Vector3i.getDisatance(senderPos, data.sector);
+            if(nearest == null || dist < distance && dist < 5) {
+                nearest = data;
+                distance = dist;
+            }
+        }
+        return nearest;
+	}
 }

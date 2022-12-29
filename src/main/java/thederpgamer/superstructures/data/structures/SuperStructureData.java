@@ -25,14 +25,16 @@ public class SuperStructureData implements DataSerializer {
     public StructureModuleData[] modules;
     public SegmentController segmentController;
     public SegmentPiece segmentPiece;
+	public SSLogEvent[] logs;
 
-    public SuperStructureData(Vector3i sunSector, SegmentPiece segmentPiece, int maxModules) {
+	public SuperStructureData(Vector3i sunSector, SegmentPiece segmentPiece, int maxModules) {
         this.sunSector = sunSector;
         this.sector = segmentPiece.getSegmentController().getSector(new Vector3i());
         this.system = segmentPiece.getSegmentController().getSystem(new Vector3i());
         this.segmentPiece = segmentPiece;
         this.segmentController = segmentPiece.getSegmentController();
         this.modules = new StructureModuleData[maxModules];
+        this.logs = new SSLogEvent[0];
     }
 
     public SuperStructureData(PacketReadBuffer packetReadBuffer) throws IOException {
@@ -50,24 +52,46 @@ public class SuperStructureData implements DataSerializer {
         if(modules.length > 0) {
             for(StructureModuleData module : modules) if(module != null) module.serialize(packetWriteBuffer);
         }
+
+        packetWriteBuffer.writeInt(logs.length);
+        if(logs.length > 0) {
+            for(SSLogEvent log : logs) log.serialize(packetWriteBuffer);
+        }
     }
 
     @Override
     public void deserialize(PacketReadBuffer packetReadBuffer) throws IOException {
-        system = packetReadBuffer.readVector();
-        sector = packetReadBuffer.readVector();
-        sunSector = packetReadBuffer.readVector();
-        long index = packetReadBuffer.readLong();
-        String entityUID = packetReadBuffer.readString();
-        modules = new StructureModuleData[packetReadBuffer.readInt()];
-        for(int i = 0; i < modules.length; i ++) {
-            try {
-                modules[i] = new StructureModuleData(packetReadBuffer);
-            } catch(Exception ignored) { }
+        try {
+            system = packetReadBuffer.readVector();
+            sector = packetReadBuffer.readVector();
+            sunSector = packetReadBuffer.readVector();
+            long index = packetReadBuffer.readLong();
+            String entityUID = packetReadBuffer.readString();
+            modules = new StructureModuleData[packetReadBuffer.readInt()];
+            for(int i = 0; i < modules.length; i ++) {
+                try {
+                    modules[i] = new StructureModuleData(packetReadBuffer);
+                } catch(Exception ignored) { }
+            }
+            segmentController = EntityUtils.getEntityFromUID(entityUID);
+            if(segmentController == null) {
+                //Todo: Delete this data due to non-existent segment controller
+            } else segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
+            logs = new SSLogEvent[packetReadBuffer.readInt()];
+            for(int i = 0; i < logs.length; i ++) {
+                try {
+                    logs[i] = new SSLogEvent(packetReadBuffer);
+                } catch(Exception ignored) { }
+            }
+        } catch(Exception exception) {
+            //Ignore
         }
-        segmentController = EntityUtils.getEntityFromUID(entityUID);
-        if(segmentController == null) {
-            //Todo: Delete this data due to non-existent segment controller
-        } else segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
+    }
+
+    public void log(int type, String message) {
+        SSLogEvent[] newLogs = new SSLogEvent[logs.length + 1];
+        System.arraycopy(logs, 0, newLogs, 0, logs.length);
+        newLogs[logs.length] = new SSLogEvent(type, message);
+        logs = newLogs;
     }
 }
