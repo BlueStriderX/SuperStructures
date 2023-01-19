@@ -11,10 +11,7 @@ import api.mod.StarMod;
 import api.utils.gui.ModGUIHandler;
 import api.utils.gui.SimplePopup;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.player.PlayerState;
 import org.schema.schine.resource.ResourceLoader;
-import thederpgamer.superstructures.data.commands.SSCommand;
-import thederpgamer.superstructures.data.structures.DysonSphereData;
 import thederpgamer.superstructures.elements.ElementManager;
 import thederpgamer.superstructures.elements.blocks.systems.DysonSphereController;
 import thederpgamer.superstructures.graphics.drawer.DysonSphereDrawer;
@@ -103,14 +100,5 @@ public class SuperStructures extends StarMod {
                 }
             }
         }, this);
-    }
-
-    private void registerCommands() {
-        StarLoader.registerCommand(new SSCommand());
-    }
-
-    public void refreshNearestSuperStructure(PlayerState sender) {
-        DysonSphereData dsData = dysonSphereDrawer.getNearestDysonSphere(sender);
-        if(dsData != null) dsData.onInit();
     }
 }

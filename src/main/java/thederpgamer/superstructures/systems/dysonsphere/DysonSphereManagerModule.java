@@ -1,6 +1,8 @@
 package thederpgamer.superstructures.systems.dysonsphere;
 
-import api.utils.game.module.util.SimpleDataStorageMCModule;
+import api.network.PacketReadBuffer;
+import api.network.PacketWriteBuffer;
+import api.utils.game.module.ModManagerContainerModule;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.controller.elements.ManagerContainer;
 import org.schema.schine.graphicsengine.core.Timer;
@@ -10,13 +12,17 @@ import thederpgamer.superstructures.elements.ElementManager;
 import thederpgamer.superstructures.graphics.drawer.DysonSphereDrawer;
 import thederpgamer.superstructures.utils.DysonSphereUtils;
 
+import java.io.IOException;
+
 /**
  * <Description>
  *
  * @author TheDerpGamer
  * @since 07/21/2021
  */
-public class DysonSphereManagerModule extends SimpleDataStorageMCModule {
+public class DysonSphereManagerModule extends ModManagerContainerModule {
+
+    private DysonSphereData structureData;
 
     public DysonSphereManagerModule(SegmentController segmentController, ManagerContainer<?> managerContainer) {
         super(segmentController, managerContainer, SuperStructures.getInstance(), ElementManager.getBlock("Dyson Sphere Controller").getId());
@@ -24,15 +30,21 @@ public class DysonSphereManagerModule extends SimpleDataStorageMCModule {
 
     @Override
     public void handle(Timer timer) {
-        try {
-            if(!DysonSphereDrawer.drawMap.containsKey(getStructureData().segmentPiece.getAbsoluteIndex()) && DysonSphereUtils.inDrawRange()) {
-                SuperStructures.getInstance().dysonSphereDrawer.addDrawData(getStructureData());
-            } else {
-                if(DysonSphereDrawer.drawMap.containsKey(getStructureData().segmentPiece.getAbsoluteIndex()) && !DysonSphereUtils.inDrawRange()) SuperStructures.getInstance().dysonSphereDrawer.removeDrawData(getStructureData().segmentPiece.getAbsoluteIndex());
-            }
-        } catch(NullPointerException exception) {
-            //Ignore
+        if(!DysonSphereDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex()) && DysonSphereUtils.inDrawRange()) {
+            SuperStructures.getInstance().dysonSphereDrawer.addDrawData(structureData);
+        } else {
+            if(DysonSphereDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex())) SuperStructures.getInstance().dysonSphereDrawer.removeDrawData(structureData.segmentPiece.getAbsoluteIndex());
         }
+    }
+
+    @Override
+    public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
+        if(structureData != null) structureData.serialize(packetWriteBuffer);
+    }
+
+    @Override
+    public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
+       structureData = new DysonSphereData(packetReadBuffer);
     }
 
     @Override
@@ -51,20 +63,19 @@ public class DysonSphereManagerModule extends SimpleDataStorageMCModule {
     }
 
     @Override
-    public void handlePlace(final long absIndex, byte orientation) {
+    public void handlePlace(long absIndex, byte orientation) {
         super.handlePlace(absIndex, orientation);
+        structureData = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(absIndex));
     }
 
     @Override
     public void handleRemove(long absIndex) {
         super.handleRemove(absIndex);
-        data = null;
+        structureData = null;
     }
 
     public DysonSphereData getStructureData() {
-        try {
-            if(data == null && isOnServer()) data = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(blocks.keySet().iterator().next()));
-        } catch(Exception ignored) {}
-        return (DysonSphereData) data;
+        if(structureData == null) structureData = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(blocks.keySet().iterator().nextLong()));
+        return structureData;
     }
 }
