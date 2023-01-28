@@ -16,11 +16,11 @@ public abstract class MultiMesh extends AbstractSceneNode {
     public Mesh frame;
     public final Mesh[] meshArray;
 
-    public MultiMesh(Mesh[] meshArray) {
+    protected MultiMesh(Mesh[] meshArray) {
         this.meshArray = meshArray;
     }
 
-    public MultiMesh(Mesh frame, Mesh[] meshArray) {
+    protected MultiMesh(Mesh frame, Mesh[] meshArray) {
         this.frame = frame;
         this.meshArray = meshArray;
     }
@@ -28,8 +28,12 @@ public abstract class MultiMesh extends AbstractSceneNode {
     @Override
     public void onInit() {
         childs.add(frame);
-        for(Mesh mesh : meshArray) {
-            if(mesh != null) childs.add(mesh);
+        for(int i = 0; i < meshArray.length; i ++) {
+            Mesh mesh = meshArray[i];
+            if(mesh != null) {
+                childs.add(mesh);
+                alignMesh(mesh, i);
+            }
         }
     }
 
@@ -41,4 +45,6 @@ public abstract class MultiMesh extends AbstractSceneNode {
     public InputState getState() {
         return GameClient.getClientState();
     }
+
+    public abstract void alignMesh(Mesh mesh, int index);
 }

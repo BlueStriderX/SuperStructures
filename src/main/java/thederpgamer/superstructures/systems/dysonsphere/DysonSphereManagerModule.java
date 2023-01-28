@@ -1,5 +1,7 @@
 package thederpgamer.superstructures.systems.dysonsphere;
 
+import api.common.GameClient;
+import api.common.GameCommon;
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
 import api.utils.game.module.ModManagerContainerModule;
@@ -22,60 +24,58 @@ import java.io.IOException;
  */
 public class DysonSphereManagerModule extends ModManagerContainerModule {
 
-    private DysonSphereData structureData;
+	private DysonSphereData structureData;
 
-    public DysonSphereManagerModule(SegmentController segmentController, ManagerContainer<?> managerContainer) {
-        super(segmentController, managerContainer, SuperStructures.getInstance(), ElementManager.getBlock("Dyson Sphere Controller").getId());
-    }
+	public DysonSphereManagerModule(SegmentController segmentController, ManagerContainer<?> managerContainer) {
+		super(segmentController, managerContainer, SuperStructures.getInstance(), ElementManager.getBlock("Dyson Sphere Controller").getId());
+	}
 
-    @Override
-    public void handle(Timer timer) {
-        if(!DysonSphereDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex()) && DysonSphereUtils.inDrawRange()) {
-            SuperStructures.getInstance().dysonSphereDrawer.addDrawData(structureData);
-        } else {
-            if(DysonSphereDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex())) SuperStructures.getInstance().dysonSphereDrawer.removeDrawData(structureData.segmentPiece.getAbsoluteIndex());
-        }
-    }
+	@Override
+	public void handle(Timer timer) {
+		if(!DysonSphereDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex()) && DysonSphereUtils.inDrawRange()) SuperStructures.getInstance().dysonSphereDrawer.addDrawData(structureData);
+		else if(DysonSphereDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex())) SuperStructures.getInstance().dysonSphereDrawer.removeDrawData(structureData.segmentPiece.getAbsoluteIndex());
+		if((GameCommon.isOnSinglePlayer() || GameCommon.isClientConnectedToServer()) && GameClient.getClientState() != null) SuperStructures.getInstance().dysonSphereDrawer.draw();
+	}
 
-    @Override
-    public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
-        if(structureData != null) structureData.serialize(packetWriteBuffer);
-    }
+	@Override
+	public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
+		if(structureData != null) structureData.serialize(packetWriteBuffer);
+	}
 
-    @Override
-    public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
-       structureData = new DysonSphereData(packetReadBuffer);
-    }
+	@Override
+	public void onTagDeserialize(PacketReadBuffer packetReadBuffer) throws IOException {
+		structureData = new DysonSphereData(packetReadBuffer);
+	}
 
-    @Override
-    public double getPowerConsumedPerSecondResting() {
-        return 0;
-    }
+	@Override
+	public double getPowerConsumedPerSecondResting() {
+		return 0;
+	}
 
-    @Override
-    public double getPowerConsumedPerSecondCharging() {
-        return 0;
-    }
+	@Override
+	public double getPowerConsumedPerSecondCharging() {
+		return 0;
+	}
 
-    @Override
-    public String getName() {
-        return "Dyson Sphere Controller";
-    }
+	@Override
+	public String getName() {
+		return "Dyson Sphere Controller";
+	}
 
-    @Override
-    public void handlePlace(long absIndex, byte orientation) {
-        super.handlePlace(absIndex, orientation);
-        structureData = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(absIndex));
-    }
+	@Override
+	public void handlePlace(long absIndex, byte orientation) {
+		super.handlePlace(absIndex, orientation);
+		structureData = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(absIndex));
+	}
 
-    @Override
-    public void handleRemove(long absIndex) {
-        super.handleRemove(absIndex);
-        structureData = null;
-    }
+	@Override
+	public void handleRemove(long absIndex) {
+		super.handleRemove(absIndex);
+		structureData = null;
+	}
 
-    public DysonSphereData getStructureData() {
-        if(structureData == null) structureData = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(blocks.keySet().iterator().nextLong()));
-        return structureData;
-    }
+	public DysonSphereData getStructureData() {
+		if(structureData == null) structureData = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(blocks.keySet().iterator().nextLong()));
+		return structureData;
+	}
 }

@@ -26,7 +26,7 @@ import thederpgamer.superstructures.utils.DataUtils;
  */
 public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
 
-    private DysonSphereModuleTypeSelectionDialog dialog;
+    private final DysonSphereModuleTypeSelectionDialog dialog;
     public SuperStructureData structureData;
     public int index;
 
@@ -286,7 +286,7 @@ public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
     private void queueModuleConstruction(StructureModuleData moduleData) {
         if(DataUtils.adminMode()) {
             moduleData.status = StructureModuleData.NONE;
-            PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "[DEBUG]: Admin mode used to construct a new dyson sphere module in " + GameClient.getClientPlayerState().getCurrentSector().toString() + ":\n" + moduleData.toString());
+            PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "[DEBUG]: Admin mode used to construct a new dyson sphere module in " + GameClient.getClientPlayerState().getCurrentSector().toString() + ":\n" + moduleData);
         } else {
             for(StructureModuleData data : structureData.modules) {
                 if(data.status != StructureModuleData.NONE) {

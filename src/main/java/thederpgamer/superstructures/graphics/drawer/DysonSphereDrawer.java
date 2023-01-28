@@ -14,45 +14,45 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DysonSphereDrawer extends ModWorldDrawer {
 
-    public static final ConcurrentHashMap<Long, DysonSphereData> drawMap = new ConcurrentHashMap<>();
+	public static final ConcurrentHashMap<Long, DysonSphereData> drawMap = new ConcurrentHashMap<>();
 
-    @Override
-    public void onInit() {
+	@Override
+	public void onInit() {
 
-    }
+	}
 
-    @Override
-    public void draw() {
-        for(DysonSphereData data : drawMap.values()) data.draw();
-    }
+	@Override
+	public void draw() {
+		for(DysonSphereData data : drawMap.values()) data.draw();
+	}
 
-    @Override
-    public void update(Timer timer) {
-        for(DysonSphereData data : drawMap.values()) {
-            if(data.updateTimer > 0) data.updateTimer -= timer.getDelta();
-            else data.updateMesh();
-        }
-    }
+	@Override
+	public void update(Timer timer) {
+		for(DysonSphereData data : drawMap.values()) {
+			if(data.updateTimer > 0) data.updateTimer -= timer.getDelta();
+			else data.updateMesh();
+		}
+	}
 
-    @Override
-    public void cleanUp() {
+	@Override
+	public void cleanUp() {
 
-    }
+	}
 
-    @Override
-    public boolean isInvisible() {
-        return false;
-    }
+	@Override
+	public boolean isInvisible() {
+		return false;
+	}
 
-    public void addDrawData(DysonSphereData data) {
-        if(drawMap.containsKey(data.segmentPiece.getAbsoluteIndex())) drawMap.replace(data.segmentPiece.getAbsoluteIndex(), data);
-        else drawMap.put(data.segmentPiece.getAbsoluteIndex(), data);
-    }
+	public void addDrawData(DysonSphereData data) {
+		if(drawMap.containsKey(data.segmentPiece.getAbsoluteIndex())) drawMap.replace(data.segmentPiece.getAbsoluteIndex(), data);
+		else drawMap.put(data.segmentPiece.getAbsoluteIndex(), data);
+	}
 
-    public void removeDrawData(long abs) {
-        if(drawMap.containsKey(abs)) {
-            drawMap.get(abs).cleanUp();
-            drawMap.remove(abs);
-        }
-    }
+	public void removeDrawData(long abs) {
+		if(drawMap.containsKey(abs)) {
+			drawMap.get(abs).cleanUp();
+			drawMap.remove(abs);
+		}
+	}
 }

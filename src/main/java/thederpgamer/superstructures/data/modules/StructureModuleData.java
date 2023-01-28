@@ -30,10 +30,10 @@ public class StructureModuleData implements DataSerializer {
     public StructureModuleData(String name, int maxLevel, int blockTypeCount) {
         this.name = name;
         this.maxLevel = maxLevel;
-        this.level = 0;
-        this.blockIds = new short[blockTypeCount];
-        this.constructionMap = new HashMap<>();
-        this.status = NONE;
+        level = 0;
+        blockIds = new short[blockTypeCount];
+        constructionMap = new HashMap<>();
+        status = NONE;
     }
 
     public StructureModuleData(PacketReadBuffer packetReadBuffer) throws IOException {

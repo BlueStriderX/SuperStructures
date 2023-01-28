@@ -32,73 +32,70 @@ import thederpgamer.superstructures.utils.EntityUtils;
  */
 public class SuperStructures extends StarMod {
 
-    //Instance
-    private static SuperStructures instance;
-    public static SuperStructures getInstance() {
-        return instance;
-    }
-    public static void main(String[] args) {
+	//Instance
+	private static SuperStructures instance;
+	public static SuperStructures getInstance() {
+		return instance;
+	}
+	public static void main(String[] args) {}
+	public SuperStructures() { }
 
-    }
-    public SuperStructures() { }
+	//Data
+	public DysonSphereControlManager dysonSphereControlManager;
 
-    //Data
-    public DysonSphereControlManager dysonSphereControlManager;
+	//Drawers
+	public DysonSphereDrawer dysonSphereDrawer;
 
-    //Drawers
-    public DysonSphereDrawer dysonSphereDrawer;
+	@Override
+	public void onEnable() {
+		instance = this;
+		ConfigManager.initialize(this);
+		registerListeners();
+	}
 
-    @Override
-    public void onEnable() {
-        instance = this;
-        ConfigManager.initialize(this);
-        registerListeners();
-    }
+	@Override
+	public void onResourceLoad(ResourceLoader loader) {
+		ResourceManager.loadResources(this, loader);
+	}
 
-    @Override
-    public void onResourceLoad(ResourceLoader loader) {
-        ResourceManager.loadResources(this, loader);
-    }
+	@Override
+	public void onBlockConfigLoad(BlockConfig config) {
+		ElementManager.addBlock(new DysonSphereController());
+		ElementManager.initialize();
+	}
 
-    @Override
-    public void onBlockConfigLoad(BlockConfig config) {
-        ElementManager.addBlock(new DysonSphereController());
+	private void registerListeners() {
+		StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
+			@Override
+			public void onEvent(RegisterWorldDrawersEvent event) {
+				event.getModDrawables().add(dysonSphereDrawer = new DysonSphereDrawer());
+			}
+		}, this);
 
-        ElementManager.initialize();
-    }
+		StarLoader.registerListener(ManagerContainerRegisterEvent.class, new Listener<ManagerContainerRegisterEvent>() {
+			@Override
+			public void onEvent(ManagerContainerRegisterEvent event) {
+				event.addModMCModule(new DysonSphereManagerModule(event.getSegmentController(), event.getContainer()));
+			}
+		}, this);
 
-    private void registerListeners() {
-        StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
-            @Override
-            public void onEvent(RegisterWorldDrawersEvent event) {
-                event.getModDrawables().add(dysonSphereDrawer = new DysonSphereDrawer());
-            }
-        }, this);
-
-        StarLoader.registerListener(ManagerContainerRegisterEvent.class, new Listener<ManagerContainerRegisterEvent>() {
-            @Override
-            public void onEvent(ManagerContainerRegisterEvent event) {
-                event.addModMCModule(new DysonSphereManagerModule(event.getSegmentController(), event.getContainer()));
-            }
-        }, this);
-
-        StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
-            @Override
-            public void onEvent(SegmentPieceActivateByPlayer event) {
-                SegmentPiece segmentPiece = event.getSegmentPiece();
-                if(segmentPiece.getInfo().getId() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
-                    if(DysonSphereUtils.isValidForDysonSphere(segmentPiece) || DataUtils.adminMode()) {
-                        if(dysonSphereControlManager == null) {
-                            dysonSphereControlManager = new DysonSphereControlManager();
-                            ModGUIHandler.registerNewControlManager(getSkeleton(), dysonSphereControlManager);
-                        }
-                        dysonSphereControlManager.structureData = ((DysonSphereManagerModule) EntityUtils.getManagerContainer(segmentPiece.getSegmentController()).getModMCModule(segmentPiece.getType())).getStructureData();
-                        dysonSphereControlManager.onInit();
-                        ((DysonSphereMenuPanel) dysonSphereControlManager.getMenuPanel()).structureData = dysonSphereControlManager.structureData;
-                        dysonSphereControlManager.setActive(true);
-                    } else new SimplePopup(GameClient.getClientState(), "Invalid Location", "This is an invalid location for a Dyson Sphere structure and therefore cannot be used.").activate();
-                }
-            }
-        }, this);
-    }
+		StarLoader.registerListener(SegmentPieceActivateByPlayer.class, new Listener<SegmentPieceActivateByPlayer>() {
+			@Override
+			public void onEvent(SegmentPieceActivateByPlayer event) {
+				SegmentPiece segmentPiece = event.getSegmentPiece();
+				if(segmentPiece.getInfo().getId() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
+					if(DysonSphereUtils.isValidForDysonSphere(segmentPiece) || DataUtils.adminMode()) {
+						if(dysonSphereControlManager == null) {
+							dysonSphereControlManager = new DysonSphereControlManager();
+							ModGUIHandler.registerNewControlManager(getSkeleton(), dysonSphereControlManager);
+						}
+						dysonSphereControlManager.structureData = ((DysonSphereManagerModule) EntityUtils.getManagerContainer(segmentPiece.getSegmentController()).getModMCModule(segmentPiece.getType())).getStructureData();
+						dysonSphereControlManager.onInit();
+						((DysonSphereMenuPanel) dysonSphereControlManager.getMenuPanel()).structureData = dysonSphereControlManager.structureData;
+						dysonSphereControlManager.setActive(true);
+					} else new SimplePopup(GameClient.getClientState(), "Invalid Location", "This is an invalid location for a Dyson Sphere structure and therefore cannot be used.").activate();
+				}
+			}
+		}, this);
+	}
 }

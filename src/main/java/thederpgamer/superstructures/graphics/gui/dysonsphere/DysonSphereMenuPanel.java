@@ -40,7 +40,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private GUIMeshOverlay statusMesh;
     private GUITilePane<StructureModuleData> modulePane;
 
-    private boolean initialized = false;
+    private boolean initialized;
 
     public DysonSphereMenuPanel(InputState inputState, SuperStructureData structureData) {
         super(inputState, "DysonSphereMenuPanel", (int) (GLFrame.getWidth() / 1.5f), (int) (GLFrame.getHeight() / 1.5f));
@@ -104,7 +104,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     }
 
     private void createModuleTile(GUITilePane<StructureModuleData> modulePane, final int index) {
-        final StructureModuleData[] module = new StructureModuleData[] {structureData.modules[index]};
+        final StructureModuleData[] module = {structureData.modules[index]};
         if(module[0] == null) {
             structureData.modules[index] = new DysonSphereEmptyModuleData(structureData);
             module[0] = structureData.modules[index];
@@ -118,8 +118,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
         } else if(module[0].status == StructureModuleData.UPGRADE) {
             buttonColor = GUIHorizontalArea.HButtonColor.GREEN;
             desc = "Upgrading module to level " + (module[0].level + 1);
-        }
-        else if(module[0].status == StructureModuleData.REPAIR) buttonColor = GUIHorizontalArea.HButtonColor.ORANGE;
+        } else if(module[0].status == StructureModuleData.REPAIR) buttonColor = GUIHorizontalArea.HButtonColor.ORANGE;
 
         if(module[0] instanceof DysonSphereEmptyModuleData) {
             GUITile tile = modulePane.addButtonTile("EMPTY", "Add new module", GUIHorizontalArea.HButtonColor.BLUE, new GUICallback() {
@@ -457,7 +456,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     private void queueModuleUpgrade(StructureModuleData moduleData, int index) {
         if(DataUtils.adminMode()) {
             moduleData.status = StructureModuleData.NONE;
-            PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "[DEBUG]: Admin mode used to upgrade a dyson sphere module in " + GameClient.getClientPlayerState().getCurrentSector().toString() + ":\n" + moduleData.toString());
+            PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "[DEBUG]: Admin mode used to upgrade a dyson sphere module in " + GameClient.getClientPlayerState().getCurrentSector().toString() + ":\n" + moduleData);
         } else {
             for(StructureModuleData data : structureData.modules) {
                 if(data.status != StructureModuleData.NONE) {

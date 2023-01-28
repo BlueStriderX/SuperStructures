@@ -37,25 +37,25 @@ public class ElementManager {
     }
 
     public static Block getBlock(short id) {
-        for(Block blockElement : getAllBlocks()) if(blockElement.getBlockInfo().getId() == id) return blockElement;
+        for(Block blockElement : blockList) if(blockElement.getBlockInfo().getId() == id) return blockElement;
         return null;
     }
 
     public static Block getBlock(String blockName) {
-        for(Block block : getAllBlocks()) {
+        for(Block block : blockList) {
             if(block.getBlockInfo().getName().equalsIgnoreCase(blockName)) return block;
         }
         return null;
     }
 
     public static Block getBlock(SegmentPiece segmentPiece) {
-        for(Block block : getAllBlocks()) if(block.getId() == segmentPiece.getType()) return block;
+        for(Block block : blockList) if(block.getId() == segmentPiece.getType()) return block;
         return null;
     }
 
 
     public static Item getItem(String itemName) {
-        for(Item item : getAllItems()) {
+        for(Item item : itemList) {
             if(item.getItemInfo().getName().equalsIgnoreCase(itemName)) return item;
         }
         return null;

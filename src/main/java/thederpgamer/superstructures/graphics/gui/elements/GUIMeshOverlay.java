@@ -19,30 +19,32 @@ public class GUIMeshOverlay extends GUIElement {
     public AbstractSceneNode mesh;
     private final GUIElement panel;
     private final float displayScale;
-
-    public boolean drawMesh = false;
+    public boolean drawMesh;
+    private boolean initialized;
 
     public GUIMeshOverlay(InputState inputState, Mesh mesh, GUIElement panel, float scale) {
         super(inputState);
         this.mesh = mesh;
         this.panel = panel;
-        this.displayScale = scale;
+        displayScale = scale;
     }
 
     public GUIMeshOverlay(InputState inputState, MultiMesh mesh, GUIElement panel, float scale) {
         super(inputState);
         this.mesh = mesh;
         this.panel = panel;
-        this.displayScale = scale;
+        displayScale = scale;
     }
 
     @Override
     public void onInit() {
         mesh.onInit();
+        initialized = true;
     }
 
     @Override
     public void draw() {
+        if(!initialized) onInit();
         if(drawMesh) {
             GUIElement.enableOrthogonal3d();
 

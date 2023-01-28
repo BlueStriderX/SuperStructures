@@ -15,8 +15,8 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
  */
 public class DysonSphereModuleTypeSelectionDialog extends GUIInputDialog {
 
-    private SuperStructureData structureData;
-    private int index;
+    private final SuperStructureData structureData;
+    private final int index;
 
     public DysonSphereModuleTypeSelectionDialog(SuperStructureData structureData, int index) {
         this.structureData = structureData;

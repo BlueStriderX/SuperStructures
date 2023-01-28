@@ -12,20 +12,20 @@ import thederpgamer.superstructures.SuperStructures;
  */
 public class ConfigManager {
 
-    //Main Config
-    private static FileConfiguration mainConfig;
-    private static final String[] defaultMainConfig = {
-            "debug-mode: false",
-            "auto-save-frequency: 5000",
-            "max-dyson-sphere-station-distance: 15000"
-    };
+	//Main Config
+	private static FileConfiguration mainConfig;
+	private static final String[] defaultMainConfig = {
+			"debug-mode: false",
+			"auto-save-frequency: 5000",
+			"max-dyson-sphere-station-distance: 15000"
+	};
 
-    public static void initialize(SuperStructures instance) {
-        mainConfig = instance.getConfig("config");
-        mainConfig.saveDefault(defaultMainConfig);
-    }
+	public static void initialize(SuperStructures instance) {
+		mainConfig = instance.getConfig("config");
+		mainConfig.saveDefault(defaultMainConfig);
+	}
 
-    public static FileConfiguration getMainConfig() {
-        return mainConfig;
-    }
+	public static FileConfiguration getMainConfig() {
+		return mainConfig;
+	}
 }

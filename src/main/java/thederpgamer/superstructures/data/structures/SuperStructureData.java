@@ -28,11 +28,11 @@ public class SuperStructureData implements DataSerializer {
 
     public SuperStructureData(Vector3i sunSector, SegmentPiece segmentPiece, int maxModules) {
         this.sunSector = sunSector;
-        this.sector = segmentPiece.getSegmentController().getSector(new Vector3i());
-        this.system = segmentPiece.getSegmentController().getSystem(new Vector3i());
+        sector = segmentPiece.getSegmentController().getSector(new Vector3i());
+        system = segmentPiece.getSegmentController().getSystem(new Vector3i());
         this.segmentPiece = segmentPiece;
-        this.segmentController = segmentPiece.getSegmentController();
-        this.modules = new StructureModuleData[maxModules];
+        segmentController = segmentPiece.getSegmentController();
+        modules = new StructureModuleData[maxModules];
     }
 
     public SuperStructureData(PacketReadBuffer packetReadBuffer) throws IOException {

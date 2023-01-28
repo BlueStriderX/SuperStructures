@@ -17,7 +17,7 @@ public abstract class Item {
 
     protected ElementInformation itemInfo;
 
-    public Item(String name, ElementCategory category) {
+    protected Item(String name, ElementCategory category) {
         String internalName = name.toLowerCase().replace(" ", "-").trim();
         short textureId = (short) ResourceManager.getTexture(internalName).getTextureId();
         itemInfo = BlockConfig.newElement(SuperStructures.getInstance(), name, textureId);
