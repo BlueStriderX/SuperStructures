@@ -10,10 +10,9 @@ import thederpgamer.superstructures.manager.EventManager;
 import thederpgamer.superstructures.manager.ResourceManager;
 
 /**
- * <Description>
+ * Main mod class.
  *
  * @author TheDerpGamer
- * @since 07/21/2021
  */
 public class SuperStructures extends StarMod {
 
