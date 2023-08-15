@@ -39,8 +39,8 @@ public enum ShapeType {
                     new Vector3f(-18.0f, 32.0f, -90.0f)
             });
 
-    public Vector3f[] facePositions;
-    public Vector3f[] faceRotations;
+    public final Vector3f[] facePositions;
+    public final Vector3f[] faceRotations;
 
     ShapeType(Vector3f[] facePositions, Vector3f[] faceRotations) {
         this.facePositions = facePositions;

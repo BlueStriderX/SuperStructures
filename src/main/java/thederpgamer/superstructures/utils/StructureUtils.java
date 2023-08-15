@@ -1,11 +1,9 @@
 package thederpgamer.superstructures.utils;
 
 import api.common.GameClient;
-import api.common.GameServer;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
-import org.schema.game.common.data.world.Sector;
-import org.schema.game.common.data.world.SimpleTransformableSendableObject;
+import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.VoidSystem;
 import org.schema.game.server.data.ServerConfig;
 import org.schema.schine.graphicsengine.forms.Mesh;
@@ -16,23 +14,26 @@ import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
 import thederpgamer.superstructures.graphics.mesh.DysonSphereMultiMesh;
 import thederpgamer.superstructures.manager.ConfigManager;
+import thederpgamer.superstructures.manager.GraphicsManager;
 import thederpgamer.superstructures.manager.ResourceManager;
+import thederpgamer.superstructures.structures.StructureType;
 
 /**
- * <Description>
+ * Various utility methods for super structures.
  *
  * @author TheDerpGamer
- * @since 07/21/2021
  */
-public class DysonSphereUtils {
+public class StructureUtils {
 
-	public static boolean isValidForDysonSphere(SegmentPiece segmentPiece) {
-		Sector sector = GameServer.getUniverse().getSector(segmentPiece.getSegmentController().getSectorId());
-		return ((sector._getDistanceToSun() * (int) ServerConfig.SECTOR_SIZE.getCurrentState()) <= (ConfigManager.getMainConfig().getDouble("max-dyson-sphere-station-distance"))) && segmentPiece.getSegmentController().getType() == SimpleTransformableSendableObject.EntityType.SPACE_STATION;
+	private static final int sectorSize = (int) ServerConfig.SECTOR_SIZE.getCurrentState();
+	private static final int sectorSizeHalf = sectorSize / 2;
+
+	public static boolean isTypeStructureController(short type) {
+		return StructureType.getType(type) != null;
 	}
 
-	public static boolean inDrawRange() {
-		return GameClient.getClientState().getCurrentGalaxy().getSunDistance(GameClient.getClientPlayerState().getCurrentSector()) <= ConfigManager.getMainConfig().getInt("max-dyson-sphere-station-distance");
+	public static boolean isValid(SegmentPiece segmentPiece) {
+		return isTypeStructureController(segmentPiece.getInfo().getId()) && StructureType.isValid(segmentPiece);
 	}
 
 	public static boolean isClientInDrawRange(float maxDistance) {
@@ -64,7 +65,7 @@ public class DysonSphereUtils {
 				if(mesh.meshArray[i] != null) {
 					if(structureData.modules[i] instanceof DysonSphereEmptyModuleData) mesh.meshArray[i].setMaterial(ResourceManager.getSprite("empty-overlay").getMaterial());
 					else {
-						switch(structureData.modules[i].status) {
+						switch(structureData.modules[i].getStatus()) {
 							case StructureModuleData.NONE:
 								mesh.meshArray[i].setMaterial(ResourceManager.getSprite("regular-overlay").getMaterial());
 								break;
@@ -81,6 +82,24 @@ public class DysonSphereUtils {
 					}
 				}
 			}
+		}
+	}
+
+	public static void openGUI(SegmentPiece segmentPiece, PlayerState playerState) {
+		StructureType type = StructureType.getType(segmentPiece.getInfo().getId());
+		switch(type) {
+			case DYSON_SPHERE:
+				GraphicsManager.getInstance().openDysonSphereControlManager(segmentPiece, playerState);
+				break;
+		}
+	}
+
+	public static boolean inDrawRange(StructureType structureType) {
+		switch(structureType) {
+			case DYSON_SPHERE:
+				return GameClient.getClientState().getCurrentGalaxy().getSunDistance(GameClient.getClientPlayerState().getCurrentSector()) <= ConfigManager.getMainConfig().getInt("max-dyson-sphere-station-distance");
+			default:
+				return false;
 		}
 	}
 }

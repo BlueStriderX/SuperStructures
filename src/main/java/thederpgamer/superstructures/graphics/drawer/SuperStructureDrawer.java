@@ -3,6 +3,7 @@ package thederpgamer.superstructures.graphics.drawer;
 import api.utils.draw.ModWorldDrawer;
 import org.schema.schine.graphicsengine.core.Timer;
 import thederpgamer.superstructures.data.structures.DysonSphereData;
+import thederpgamer.superstructures.data.structures.SuperStructureData;
 
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,9 +13,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author TheDerpGamer
  * @version 1.0 - [12/06/2021]
  */
-public class DysonSphereDrawer extends ModWorldDrawer {
+public class SuperStructureDrawer extends ModWorldDrawer {
 
-	public static final ConcurrentHashMap<Long, DysonSphereData> drawMap = new ConcurrentHashMap<>();
+	public static final ConcurrentHashMap<Long, SuperStructureData> drawMap = new ConcurrentHashMap<>();
 
 	@Override
 	public void onInit() {
@@ -23,12 +24,12 @@ public class DysonSphereDrawer extends ModWorldDrawer {
 
 	@Override
 	public void draw() {
-		for(DysonSphereData data : drawMap.values()) data.draw();
+		for(SuperStructureData data : drawMap.values()) data.draw();
 	}
 
 	@Override
 	public void update(Timer timer) {
-		for(DysonSphereData data : drawMap.values()) {
+		for(SuperStructureData data : drawMap.values()) {
 			if(data.updateTimer > 0) data.updateTimer -= timer.getDelta();
 			else data.updateMesh();
 		}

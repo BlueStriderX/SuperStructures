@@ -1,4 +1,4 @@
-package thederpgamer.superstructures.systems.dysonsphere;
+package thederpgamer.superstructures.structures.dysonsphere;
 
 import api.common.GameClient;
 import api.common.GameCommon;
@@ -11,10 +11,13 @@ import org.schema.schine.graphicsengine.core.Timer;
 import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.structures.DysonSphereData;
 import thederpgamer.superstructures.elements.ElementManager;
-import thederpgamer.superstructures.graphics.drawer.DysonSphereDrawer;
-import thederpgamer.superstructures.utils.DysonSphereUtils;
+import thederpgamer.superstructures.graphics.drawer.SuperStructureDrawer;
+import thederpgamer.superstructures.manager.GraphicsManager;
+import thederpgamer.superstructures.structures.StructureType;
+import thederpgamer.superstructures.utils.StructureUtils;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * <Description>
@@ -32,9 +35,9 @@ public class DysonSphereManagerModule extends ModManagerContainerModule {
 
 	@Override
 	public void handle(Timer timer) {
-		if(!DysonSphereDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex()) && DysonSphereUtils.inDrawRange()) SuperStructures.getInstance().dysonSphereDrawer.addDrawData(structureData);
-		else if(DysonSphereDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex())) SuperStructures.getInstance().dysonSphereDrawer.removeDrawData(structureData.segmentPiece.getAbsoluteIndex());
-		if((GameCommon.isOnSinglePlayer() || GameCommon.isClientConnectedToServer()) && GameClient.getClientState() != null) SuperStructures.getInstance().dysonSphereDrawer.draw();
+		if(!SuperStructureDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex()) && StructureUtils.inDrawRange(Objects.requireNonNull(StructureType.getType(structureData.segmentPiece.getType())))) GraphicsManager.getInstance().superStructureDrawer.addDrawData(structureData);
+		else if(SuperStructureDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex())) GraphicsManager.getInstance().superStructureDrawer.removeDrawData(structureData.segmentPiece.getAbsoluteIndex());
+		if((GameCommon.isOnSinglePlayer() || GameCommon.isClientConnectedToServer()) && GameClient.getClientState() != null) GraphicsManager.getInstance().superStructureDrawer.draw();
 	}
 
 	@Override
@@ -65,7 +68,7 @@ public class DysonSphereManagerModule extends ModManagerContainerModule {
 	@Override
 	public void handlePlace(long absIndex, byte orientation) {
 		super.handlePlace(absIndex, orientation);
-		structureData = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(absIndex));
+		structureData = StructureUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(absIndex));
 	}
 
 	@Override
@@ -75,7 +78,7 @@ public class DysonSphereManagerModule extends ModManagerContainerModule {
 	}
 
 	public DysonSphereData getStructureData() {
-		if(structureData == null) structureData = DysonSphereUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(blocks.keySet().iterator().nextLong()));
+		if(structureData == null) structureData = StructureUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(blocks.keySet().iterator().nextLong()));
 		return structureData;
 	}
 }

@@ -5,6 +5,8 @@ import api.network.PacketWriteBuffer;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.controller.SegmentController;
 import org.schema.game.common.data.SegmentPiece;
+import org.schema.schine.graphicsengine.core.Drawable;
+import org.schema.schine.graphicsengine.shader.Shaderable;
 import thederpgamer.superstructures.data.DataSerializer;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
 import thederpgamer.superstructures.utils.EntityUtils;
@@ -17,7 +19,7 @@ import java.io.IOException;
  * @author TheDerpGamer
  * @since 07/21/2021
  */
-public class SuperStructureData implements DataSerializer {
+public abstract class SuperStructureData implements DataSerializer, Drawable, Shaderable {
 
     public Vector3i system;
     public Vector3i sector;
@@ -25,6 +27,7 @@ public class SuperStructureData implements DataSerializer {
     public StructureModuleData[] modules;
     public SegmentController segmentController;
     public SegmentPiece segmentPiece;
+    public float updateTimer;
 
     public SuperStructureData(Vector3i sunSector, SegmentPiece segmentPiece, int maxModules) {
         this.sunSector = sunSector;
@@ -70,4 +73,6 @@ public class SuperStructureData implements DataSerializer {
             //Todo: Delete this data due to non-existent segment controller
         } else segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
     }
+
+    public abstract void updateMesh();
 }

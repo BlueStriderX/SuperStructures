@@ -3,6 +3,7 @@ package thederpgamer.superstructures.data.modules;
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
 import thederpgamer.superstructures.data.DataSerializer;
+import thederpgamer.superstructures.data.structures.SuperStructureData;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,18 +21,20 @@ public class StructureModuleData implements DataSerializer {
     public static final int UPGRADE = 2;
     public static final int REPAIR = 3;
 
-    public String name;
-    public int level;
-    public int maxLevel;
-    public short[] blockIds;
-    public int status;
-    public HashMap<Short, Integer> constructionMap;
+    private SuperStructureData structureData;
+    private String name;
+    private String description;
+    private int level;
+    private int maxLevel;
+    private int status;
+    private HashMap<Short, Integer> constructionMap;
 
-    public StructureModuleData(String name, int maxLevel, int blockTypeCount) {
+    public StructureModuleData(SuperStructureData structureData, String name, String description, int maxLevel) {
+        this.structureData = structureData;
         this.name = name;
+        this.description = description;
         this.maxLevel = maxLevel;
         level = 0;
-        blockIds = new short[blockTypeCount];
         constructionMap = new HashMap<>();
         status = NONE;
     }
@@ -40,17 +43,16 @@ public class StructureModuleData implements DataSerializer {
         deserialize(packetReadBuffer);
     }
 
-    public String getDesc() {
-        return "";
+    public String getDescription() {
+        return description;
     }
 
     @Override
     public void serialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
         packetWriteBuffer.writeString(name);
+        packetWriteBuffer.writeString(description);
         packetWriteBuffer.writeInt(level);
         packetWriteBuffer.writeInt(maxLevel);
-        packetWriteBuffer.writeInt(blockIds.length);
-        if(blockIds.length > 0) for(short s : blockIds) packetWriteBuffer.writeShort(s);
         packetWriteBuffer.writeInt(status);
         packetWriteBuffer.writeObject(constructionMap);
     }
@@ -58,14 +60,46 @@ public class StructureModuleData implements DataSerializer {
     @Override
     public void deserialize(PacketReadBuffer packetReadBuffer) throws IOException {
         name = packetReadBuffer.readString();
+        description = packetReadBuffer.readString();
         level = packetReadBuffer.readInt();
         maxLevel = packetReadBuffer.readInt();
-        int size = packetReadBuffer.readInt();
-        if(size > 0) {
-            blockIds = new short[size];
-            for(int i = 0; i < size; i ++) blockIds[i] = packetReadBuffer.readShort();
-        }
         status = packetReadBuffer.readInt();
         constructionMap = packetReadBuffer.readObject(constructionMap.getClass());
+    }
+
+    public SuperStructureData getStructureData() {
+        return structureData;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public int getMaxLevel() {
+        return maxLevel;
+    }
+
+    public void setMaxLevel(int maxLevel) {
+        this.maxLevel = maxLevel;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public HashMap<Short, Integer> getConstructionMap() {
+        return constructionMap;
     }
 }
