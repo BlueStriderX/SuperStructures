@@ -6,6 +6,8 @@ import api.common.GameServer;
 import api.network.PacketReadBuffer;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
+import org.schema.schine.graphicsengine.core.DrawableScene;
+import org.schema.schine.graphicsengine.shader.Shader;
 
 /**
  * [Description]
@@ -22,6 +24,11 @@ public class StellarCageStructureData extends SuperStructureData {
 		super(readBuffer);
 	}
 
+	@Override
+	public void updateMesh() {
+
+	}
+
 	public SunType getSunType() {
 		try {
 			if((GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) && GameServer.getServerState() != null) return SunType.getFromSystem(GameServer.getServerState().getUniverse().getGalaxyFromSystemPos(system), system);
@@ -31,5 +38,40 @@ public class StellarCageStructureData extends SuperStructureData {
 			exception.printStackTrace();
 			return SunType.VOID;
 		}
+	}
+
+	@Override
+	public void cleanUp() {
+
+	}
+
+	@Override
+	public void draw() {
+
+	}
+
+	@Override
+	public boolean isInvisible() {
+		return false;
+	}
+
+	@Override
+	public void onInit() {
+
+	}
+
+	@Override
+	public void onExit() {
+
+	}
+
+	@Override
+	public void updateShader(DrawableScene drawableScene) {
+
+	}
+
+	@Override
+	public void updateShaderParameters(Shader shader) {
+
 	}
 }

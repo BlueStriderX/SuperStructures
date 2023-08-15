@@ -10,10 +10,11 @@ import org.schema.schine.graphicsengine.forms.gui.GUIElement;
 import org.schema.schine.graphicsengine.forms.gui.GUIOverlay;
 import org.schema.schine.graphicsengine.forms.gui.newgui.*;
 import org.schema.schine.input.InputState;
-import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
-import thederpgamer.superstructures.data.modules.dysonsphere.*;
+import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereFoundryModuleData;
+import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereSiphonModuleData;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
+import thederpgamer.superstructures.manager.GraphicsManager;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.PlayerUtils;
 
@@ -118,7 +119,7 @@ public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
     }
 
     private void queueModuleConstruction(StructureModuleData moduleData) {
-        if(PlayerUtils.adminMode()) {
+        if(PlayerUtils.adminMode(GameClient.getClientPlayerState())) {
             moduleData.setStatus(StructureModuleData.NONE);
             api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "[DEBUG]: Admin mode used to construct a new dyson sphere module in " + GameClient.getClientPlayerState().getCurrentSector().toString() + ":\n" + moduleData);
         } else {
@@ -133,6 +134,6 @@ public class DysonSphereModuleTypeSelectionPanel extends GUIInputDialogPanel {
         }
         moduleData.setLevel(1);
         structureData.modules[index] = moduleData;
-        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
+        ((DysonSphereMenuPanel) GraphicsManager.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
     }
 }

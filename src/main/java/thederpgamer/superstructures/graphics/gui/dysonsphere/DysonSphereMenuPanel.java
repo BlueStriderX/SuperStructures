@@ -14,11 +14,13 @@ import org.schema.schine.graphicsengine.forms.gui.newgui.GUIHorizontalArea;
 import org.schema.schine.graphicsengine.forms.gui.newgui.GUITile;
 import org.schema.schine.graphicsengine.forms.gui.newgui.GUITilePane;
 import org.schema.schine.input.InputState;
-import thederpgamer.superstructures.SuperStructures;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
-import thederpgamer.superstructures.data.modules.dysonsphere.*;
+import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereEmptyModuleData;
+import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereFoundryModuleData;
+import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereSiphonModuleData;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
 import thederpgamer.superstructures.graphics.gui.elements.GUIMeshOverlay;
+import thederpgamer.superstructures.manager.GraphicsManager;
 import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.PlayerUtils;
 import thederpgamer.superstructures.utils.StructureUtils;
@@ -165,7 +167,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].getStatus() == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].setStatus(StructureModuleData.NONE);
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
+                        ((DysonSphereMenuPanel) GraphicsManager.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                     }
                 }
 
@@ -208,7 +210,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
                         if(module[0].getStatus() == StructureModuleData.CONSTRUCTION) module[0] = new DysonSphereEmptyModuleData(structureData);
                         module[0].setStatus(StructureModuleData.NONE);
                         structureData.modules[index] = module[0];
-                        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
+                        ((DysonSphereMenuPanel) GraphicsManager.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
                     }
                 }
 
@@ -238,7 +240,7 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
     }
 
     private void queueModuleUpgrade(StructureModuleData moduleData, int index) {
-        if(PlayerUtils.adminMode()) {
+        if(PlayerUtils.adminMode(GameClient.getClientPlayerState())) {
             moduleData.setStatus(StructureModuleData.NONE);
             api.utils.game.PlayerUtils.sendMessage(GameClient.getClientPlayerState(), "[DEBUG]: Admin mode used to upgrade a dyson sphere module in " + GameClient.getClientPlayerState().getCurrentSector().toString() + ":\n" + moduleData);
         } else {
@@ -252,6 +254,6 @@ public class DysonSphereMenuPanel extends GUIMenuPanel {
             moduleData.setStatus(StructureModuleData.UPGRADE);
         }
         structureData.modules[index] = moduleData;
-        ((DysonSphereMenuPanel) SuperStructures.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
+        ((DysonSphereMenuPanel) GraphicsManager.getInstance().dysonSphereControlManager.getMenuPanel()).refreshTabs();
     }
 }

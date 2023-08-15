@@ -8,8 +8,9 @@ import com.bulletphysics.linearmath.Transform;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.server.data.ServerConfig;
-import org.schema.schine.graphicsengine.core.Drawable;
+import org.schema.schine.graphicsengine.core.DrawableScene;
 import org.schema.schine.graphicsengine.forms.Mesh;
+import org.schema.schine.graphicsengine.shader.Shader;
 import thederpgamer.superstructures.graphics.mesh.DysonSphereMultiMesh;
 import thederpgamer.superstructures.utils.StructureUtils;
 
@@ -21,7 +22,7 @@ import java.io.IOException;
  *
  * @author TheDerpGamer
  */
-public class DysonSphereData extends SuperStructureData implements Drawable {
+public class DysonSphereData extends SuperStructureData {
 
 	private static final int sectorSize = (int) ServerConfig.SECTOR_SIZE.getCurrentState();
 	private static final int sectorSizeHalf = sectorSize / 2;
@@ -111,6 +112,21 @@ public class DysonSphereData extends SuperStructureData implements Drawable {
 	@Override
 	public boolean isInvisible() {
 		return !StructureUtils.isClientInDrawRange(20000);
+	}
+
+	@Override
+	public void onExit() {
+
+	}
+
+	@Override
+	public void updateShader(DrawableScene drawableScene) {
+
+	}
+
+	@Override
+	public void updateShaderParameters(Shader shader) {
+
 	}
 
 	public SunType getSunType() {

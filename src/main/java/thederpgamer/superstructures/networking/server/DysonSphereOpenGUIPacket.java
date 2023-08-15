@@ -50,7 +50,7 @@ public class DysonSphereOpenGUIPacket extends Packet {
 			SegmentController segmentController = (SegmentController) sendable;
 			if(segmentController.getSegmentBuffer().existsPointUnsave(index) && StructureUtils.isTypeStructureController(segmentController.getSegmentBuffer().getPointUnsave(index).getType())) {
 				if(type.getType() == segmentController.getSegmentBuffer().getPointUnsave(index).getType()) segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);
-				else throw new IOException("Segment piece type does not match structure type: " + segmentController.getSegmentBuffer().getPointUnsave(index).getType() + " != " + type.getType());\
+				else throw new IOException("Segment piece type does not match structure type: " + segmentController.getSegmentBuffer().getPointUnsave(index).getType() + " != " + type.getType());
 			} else throw new IOException("Received invalid segment piece from server: " + segmentController);
 		} else throw new IOException("Received invalid sendable from server: " + sendable.toString());
 	}
