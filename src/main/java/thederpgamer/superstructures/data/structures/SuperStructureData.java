@@ -21,24 +21,24 @@ import java.io.IOException;
  */
 public abstract class SuperStructureData implements DataSerializer, Drawable, Shaderable {
 
-    public Vector3i system;
-    public Vector3i sector;
-    public Vector3i sunSector;
-    public StructureModuleData[] modules;
+    public Vector3i system = new Vector3i();
+    public Vector3i sector = new Vector3i();
+    public Vector3i sunSector = new Vector3i();
+    public StructureModuleData[] modules = new StructureModuleData[12];
     public SegmentController segmentController;
     public SegmentPiece segmentPiece;
     public float updateTimer;
 
-    public SuperStructureData(Vector3i sunSector, SegmentPiece segmentPiece, int maxModules) {
+    protected SuperStructureData(Vector3i sunSector, SegmentPiece segmentPiece, int maxModules) {
         this.sunSector = sunSector;
-        sector = segmentPiece.getSegmentController().getSector(new Vector3i());
-        system = segmentPiece.getSegmentController().getSystem(new Vector3i());
+        segmentPiece.getSegmentController().getSector(sector);
+        segmentPiece.getSegmentController().getSystem(system);
         this.segmentPiece = segmentPiece;
         segmentController = segmentPiece.getSegmentController();
         modules = new StructureModuleData[maxModules];
     }
 
-    public SuperStructureData(PacketReadBuffer packetReadBuffer) throws IOException {
+    protected SuperStructureData(PacketReadBuffer packetReadBuffer) throws IOException {
         deserialize(packetReadBuffer);
     }
 
@@ -48,7 +48,7 @@ public abstract class SuperStructureData implements DataSerializer, Drawable, Sh
         packetWriteBuffer.writeVector(sector);
         packetWriteBuffer.writeVector(sunSector);
         packetWriteBuffer.writeLong(segmentPiece.getAbsoluteIndex());
-        packetWriteBuffer.writeString(segmentController.getUniqueIdentifier());
+        packetWriteBuffer.writeLong(segmentController.getDbId());
         packetWriteBuffer.writeInt(modules.length);
         if(modules.length > 0) {
             for(StructureModuleData module : modules) if(module != null) module.serialize(packetWriteBuffer);
@@ -57,18 +57,19 @@ public abstract class SuperStructureData implements DataSerializer, Drawable, Sh
 
     @Override
     public void deserialize(PacketReadBuffer packetReadBuffer) throws IOException {
+        if(packetReadBuffer.available() <= 0) return;
         system = packetReadBuffer.readVector();
         sector = packetReadBuffer.readVector();
         sunSector = packetReadBuffer.readVector();
         long index = packetReadBuffer.readLong();
-        String entityUID = packetReadBuffer.readString();
+        long entityId = packetReadBuffer.readLong();
         modules = new StructureModuleData[packetReadBuffer.readInt()];
         for(int i = 0; i < modules.length; i ++) {
             try {
                 modules[i] = new StructureModuleData(packetReadBuffer);
             } catch(Exception ignored) { }
         }
-        segmentController = EntityUtils.getEntityFromUID(entityUID);
+        segmentController = EntityUtils.getEntityFromID(entityId);
         if(segmentController == null) {
             //Todo: Delete this data due to non-existent segment controller
         } else segmentPiece = segmentController.getSegmentBuffer().getPointUnsave(index);

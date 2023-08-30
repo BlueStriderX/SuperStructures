@@ -1,7 +1,6 @@
 package thederpgamer.superstructures.utils;
 
 import api.common.GameCommon;
-import api.common.GameServer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.schema.game.common.controller.Planet;
 import org.schema.game.common.controller.SegmentController;
@@ -18,18 +17,12 @@ import org.schema.schine.network.objects.Sendable;
  */
 public class EntityUtils {
 
-    public static SegmentController getEntityFromUID(String entityUID) {
-        if(GameCommon.isOnSinglePlayer() || GameCommon.isDedicatedServer()) {
-            return GameServer.getServerState().getSegmentControllersByName().get(entityUID);
-        } else {
-            Int2ObjectOpenHashMap<Sendable> map = GameCommon.getGameState().getState().getLocalAndRemoteObjectContainer().getLocalObjects();
-            for(Sendable sendable : map.values()) {
-                if(sendable instanceof SegmentController) {
-                    if(((SegmentController) sendable).getUniqueIdentifier().equals(entityUID)) return (SegmentController) sendable;
-                }
-            }
-            return null;
+    public static SegmentController getEntityFromID(long entityID) {
+        Int2ObjectOpenHashMap<Sendable> map = GameCommon.getGameState().getState().getLocalAndRemoteObjectContainer().getLocalObjects();
+        for(Sendable sendable : map.values()) {
+            if(sendable instanceof SegmentController && ((SegmentController) sendable).getDbId() == entityID) return (SegmentController) sendable;
         }
+        return null;
     }
 
     public static ManagerContainer<?> getManagerContainer(SegmentController segmentController) {

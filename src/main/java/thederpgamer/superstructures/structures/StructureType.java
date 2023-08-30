@@ -44,10 +44,10 @@ public enum StructureType {
 	public static boolean isValid(SegmentPiece segmentPiece) {
 		StructureType type = getType(segmentPiece.getType());
 		SegmentController segmentController = segmentPiece.getSegmentController();
-		Sector sector = GameServer.getUniverse().getSector(segmentPiece.getSegmentController().getSectorId());
+		Sector sector = GameServer.getUniverse().getSector(segmentController.getSectorId());
 		switch(type) {
 			case DYSON_SPHERE:
-				return ((sector._getDistanceToSun() * (int) ServerConfig.SECTOR_SIZE.getCurrentState()) <= (ConfigManager.getMainConfig().getDouble("max-dyson-sphere-station-distance"))) && segmentPiece.getSegmentController().getType() == SimpleTransformableSendableObject.EntityType.SPACE_STATION;
+				return ((sector._getDistanceToSun() * (int) ServerConfig.SECTOR_SIZE.getCurrentState()) <= (ConfigManager.getMainConfig().getDouble("max-dyson-sphere-station-distance"))) && segmentController.getType() == SimpleTransformableSendableObject.EntityType.SPACE_STATION;
 			default:
 				return false;
 		}

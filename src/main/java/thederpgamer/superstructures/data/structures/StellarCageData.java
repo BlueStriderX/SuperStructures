@@ -14,13 +14,13 @@ import org.schema.schine.graphicsengine.shader.Shader;
  *
  * @author TheDerpGamer (TheDerpGamer#0027)
  */
-public class StellarCageStructureData extends SuperStructureData {
+public class StellarCageData extends SuperStructureData {
 
-	public StellarCageStructureData(Vector3i sunSector, SegmentPiece segmentPiece, int maxModules) {
+	public StellarCageData(Vector3i sunSector, SegmentPiece segmentPiece, int maxModules) {
 		super(sunSector, segmentPiece, maxModules);
 	}
 
-	public StellarCageStructureData(PacketReadBuffer readBuffer) throws Exception {
+	public StellarCageData(PacketReadBuffer readBuffer) throws Exception {
 		super(readBuffer);
 	}
 

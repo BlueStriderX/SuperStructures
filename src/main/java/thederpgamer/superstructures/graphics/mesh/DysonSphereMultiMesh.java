@@ -1,7 +1,12 @@
 package thederpgamer.superstructures.graphics.mesh;
 
+import org.lwjgl.opengl.GL11;
+import org.schema.schine.graphicsengine.core.DrawableScene;
 import org.schema.schine.graphicsengine.core.GlUtil;
 import org.schema.schine.graphicsengine.forms.Mesh;
+import org.schema.schine.graphicsengine.shader.Shader;
+import org.schema.schine.graphicsengine.shader.ShaderLibrary;
+import org.schema.schine.graphicsengine.shader.Shaderable;
 
 import javax.vecmath.Quat4f;
 import javax.vecmath.Vector3f;
@@ -13,7 +18,7 @@ import javax.vecmath.Vector4f;
  * @author TheDerpGamer
  * @version 1.0 - [09/28/2021]
  */
-public class DysonSphereMultiMesh extends MultiMesh {
+public class DysonSphereMultiMesh extends MultiMesh implements Shaderable {
 
 	private final Vector3f lastMousePos = new Vector3f();
 	private final Vector3f mouseRotation = new Vector3f();
@@ -38,36 +43,20 @@ public class DysonSphereMultiMesh extends MultiMesh {
 	@Override
 	public void draw() {
 		if(!initialized) onInit();
-        /*
-        if(Mouse.isButtonDown(1)) {
-            mouseRotation.x += lastMousePos.x - Mouse.getEventX();
-            mouseRotation.y += lastMousePos.y - Mouse.getEventY();
-        }
-        lastMousePos.x = Mouse.getEventX();
-        lastMousePos.y = Mouse.getEventY();
+		GlUtil.glEnable(GL11.GL_BLEND);
+		GlUtil.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GlUtil.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        float magnitude = (float) (Math.sqrt(mouseRotation.x * mouseRotation.x + mouseRotation.y * mouseRotation.y) * 0.01f);
-        vectorRotation.set(mouseRotation.y, -mouseRotation.x, 0.0f, magnitude);
-        quatRotation.set(vectorRotation); //Convert to Quat4f
-        currentRotation.set(getRot4()); //Get current rotation
-
-        quatRotation.mul(currentRotation); //Apply current rotation
-        finalRotation.set(quatRotation); //Convert to Vector4f
-        setQuatRot(finalRotation); //Set rotation
-         */
-		GlUtil.enableBlend(true);
+		ShaderLibrary.shardShader.setShaderInterface(this);
+		ShaderLibrary.shardShader.load();
 		if(frame != null) frame.draw();
-		//Todo: Separate draw function for gui version
+		ShaderLibrary.shardShader.unload();
+
+		GlUtil.glDisable(GL11.GL_BLEND);
 		for(int i = 0; i < 12; i ++) {
 			if(meshArray[i] != null) {
+
 				meshArray[i].draw();
-                /*
-                highlightOverlays[i].transform();
-                highlightOverlays[i].checkMouseInside();
-                //highlightOverlays[i].checkMouseInsideWithTransform();
-                if(highlightOverlays[i].isInside()) meshArray[i].setMaterial(ResourceManager.getSprite("highlight-overlay").getMaterial());
-                else meshArray[i].setMaterial(ResourceManager.getSprite("regular-overlay").getMaterial());
-                */
 			}
 		}
 	}
@@ -91,5 +80,20 @@ public class DysonSphereMultiMesh extends MultiMesh {
 		mesh.setQuatRot(frame.getRot4());
 		mesh.rotateBy((float) 1.5707963267948966, (float) 1.5707963267948966, (float) 1.5707963267948966); //Rotate the mesh 90 degrees on all axes
 		mesh.rotateBy(0, 0, (float) Math.toRadians(72 * index)); //Rotate the mesh 72 degrees on the z axis for each index
+	}
+
+	@Override
+	public void onExit() {
+
+	}
+
+	@Override
+	public void updateShader(DrawableScene drawableScene) {
+
+	}
+
+	@Override
+	public void updateShaderParameters(Shader shader) {
+
 	}
 }

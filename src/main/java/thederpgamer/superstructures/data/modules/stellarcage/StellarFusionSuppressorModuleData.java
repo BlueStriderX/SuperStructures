@@ -1,7 +1,7 @@
 package thederpgamer.superstructures.data.modules.stellarcage;
 
 import thederpgamer.superstructures.data.modules.StructureModuleData;
-import thederpgamer.superstructures.data.structures.StellarCageStructureData;
+import thederpgamer.superstructures.data.structures.StellarCageData;
 import thederpgamer.superstructures.data.modules.StructureModuleActivationInterface;
 
 /**
@@ -11,7 +11,7 @@ import thederpgamer.superstructures.data.modules.StructureModuleActivationInterf
  */
 public class StellarFusionSuppressorModuleData extends StructureModuleData implements StructureModuleActivationInterface {
 
-	public StellarFusionSuppressorModuleData(StellarCageStructureData structureData) {
+	public StellarFusionSuppressorModuleData(StellarCageData structureData) {
 		super(structureData, "Stellar Fusion Suppressor", "Suppresses the fusion process in a star, gradually shrinking it and decreasing it's heat damage radius and resource capacity.", 5);
 	}
 
@@ -27,6 +27,6 @@ public class StellarFusionSuppressorModuleData extends StructureModuleData imple
 
 	@Override
 	public boolean canActivate() {
-		return ((StellarCageStructureData) getStructureData()).getSunType().previousIndex != -1;
+		return ((StellarCageData) getStructureData()).getSunType().previousIndex != -1;
 	}
 }

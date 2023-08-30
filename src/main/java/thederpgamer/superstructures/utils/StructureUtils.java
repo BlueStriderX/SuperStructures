@@ -1,10 +1,12 @@
 package thederpgamer.superstructures.utils;
 
 import api.common.GameClient;
+import api.common.GameServer;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.player.PlayerState;
 import org.schema.game.common.data.world.VoidSystem;
+import org.schema.game.server.data.Galaxy;
 import org.schema.game.server.data.ServerConfig;
 import org.schema.schine.graphicsengine.forms.Mesh;
 import thederpgamer.superstructures.data.modules.StructureModuleData;
@@ -41,16 +43,22 @@ public class StructureUtils {
 	}
 
 	public static DysonSphereData generateStructureData(SegmentPiece segmentPiece) {
-		return new DysonSphereData(VoidSystem.getSunSectorPosAbs(GameClient.getClientState().getCurrentGalaxy(), segmentPiece.getSegmentController().getSystem(new Vector3i()), new Vector3i()), segmentPiece);
+		Vector3i system = new Vector3i();
+		segmentPiece.getSegmentController().getSystem(system);
+		if(segmentPiece.getSegmentController().isOnServer()) {
+			Galaxy galaxy = GameServer.getServerState().getUniverse().getGalaxyFromSystemPos(system);
+			return new DysonSphereData(VoidSystem.getSunSectorPosAbs(galaxy, system, new Vector3i()), segmentPiece);
+		} else return new DysonSphereData(VoidSystem.getSunSectorPosAbs(GameClient.getClientState().getCurrentGalaxy(), system, new Vector3i()), segmentPiece);
 	}
 
 	public static DysonSphereMultiMesh createMultiMesh(SuperStructureData structureData) {
 		Mesh[] meshArray = new Mesh[12];
 		for(int i = 0; i < meshArray.length; i ++) {
-			StructureModuleData moduleData = structureData.modules[i];
 			try {
+				StructureModuleData moduleData = structureData.modules[i];
 				if(moduleData == null) structureData.modules[i] = new DysonSphereEmptyModuleData(structureData);
-				meshArray[i] = ResourceManager.getMesh("dyson_sphere_empty_module_" + i);
+//				meshArray[i] = ResourceManager.getMesh("dyson_sphere_empty_module_" + i);
+				meshArray[i] = ResourceManager.getMesh("dyson_sphere_empty_module_0");
 			} catch(Exception exception) {
 				exception.printStackTrace();
 			}

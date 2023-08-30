@@ -1,17 +1,21 @@
 package thederpgamer.superstructures.data.structures;
 
 import api.common.GameClient;
-import api.common.GameCommon;
 import api.common.GameServer;
 import api.network.PacketReadBuffer;
 import com.bulletphysics.linearmath.Transform;
+import org.lwjgl.opengl.GL11;
 import org.schema.common.util.linAlg.Vector3i;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.server.data.ServerConfig;
 import org.schema.schine.graphicsengine.core.DrawableScene;
+import org.schema.schine.graphicsengine.core.GlUtil;
 import org.schema.schine.graphicsengine.forms.Mesh;
 import org.schema.schine.graphicsengine.shader.Shader;
-import thederpgamer.superstructures.graphics.mesh.DysonSphereMultiMesh;
+import org.schema.schine.graphicsengine.shader.ShaderLibrary;
+import thederpgamer.superstructures.data.modules.StructureModuleData;
+import thederpgamer.superstructures.data.modules.dysonsphere.DysonSphereEmptyModuleData;
+import thederpgamer.superstructures.manager.ResourceManager;
 import thederpgamer.superstructures.utils.StructureUtils;
 
 import javax.vecmath.Vector3f;
@@ -28,15 +32,17 @@ public class DysonSphereData extends SuperStructureData {
 	private static final int sectorSizeHalf = sectorSize / 2;
 	private static final Vector3f scale = new Vector3f(sectorSizeHalf, sectorSizeHalf, sectorSizeHalf);
 
-	public DysonSphereMultiMesh mesh;
-	public Transform starTransform;
-	public Vector3i centerSector;
+	public Mesh frameMesh;
+	public final Mesh[] modulesMeshes = new Mesh[12];
+	public Transform starTransform = new Transform();
+	public Vector3i centerSector = new Vector3i();
 
 	public float updateTimer;
 	public boolean initialized;
 
 	public DysonSphereData(Vector3i sunPos, SegmentPiece segmentPiece) {
 		super(sunPos, segmentPiece, 12);
+		for(int i = 0; i < modules.length; i ++) modules[i] = new DysonSphereEmptyModuleData(this);
 	}
 
 	public DysonSphereData(PacketReadBuffer packetReadBuffer) throws IOException {
@@ -76,9 +82,9 @@ public class DysonSphereData extends SuperStructureData {
 			Vector3f difference = new Vector3f(centerSector.x - currentSector.x, centerSector.y - currentSector.y, centerSector.z - currentSector.z);
 			starTransform.origin.set(difference);
 		}
-		mesh.frame.setScale(scale);
-		mesh.frame.setTransform(starTransform);
-		for(Mesh mesh : mesh.meshArray) {
+		frameMesh.setScale(scale);
+		frameMesh.setTransform(starTransform);
+		for(Mesh mesh : modulesMeshes) {
 			if(mesh != null) {
 				mesh.setScale(scale);
 				mesh.setTransform(starTransform);
@@ -89,24 +95,57 @@ public class DysonSphereData extends SuperStructureData {
 
 	@Override
 	public void onInit() {
-		starTransform = new Transform();
+		if(segmentController.isOnServer()) return;
 		starTransform.setIdentity();
-		system = GameClient.getClientState().getCurrentClientSystem().getPos();
-		centerSector = GameClient.getClientState().getCurrentClientSystem().getSunSectorPosAbs(GameClient.getClientState().getCurrentGalaxy(), new Vector3i());
-		mesh = StructureUtils.createMultiMesh(this);
-		mesh.onInit();
+		GameClient.getClientController().getClientChannel().getGalaxyManagerClient().getSystemOnClient(sector).getSunSectorPosAbs(GameClient.getClientState().getCurrentGalaxy(), centerSector);
+		frameMesh = ResourceManager.getMesh("dyson_sphere_frame");
+		frameMesh.onInit();
+		for(int i = 0; i < 12; i ++) {
+//			modulesMeshes[i] = ResourceManager.getMesh("dyson_sphere_empty_module_" + i);
+			modulesMeshes[i] = ResourceManager.getMesh("dyson_sphere_empty_module_0");
+			modulesMeshes[i].onInit();
+		}
 		initialized = true;
 	}
 
 	@Override
 	public void draw() {
 		if(!initialized) onInit();
-		mesh.draw();
+		try {
+			GlUtil.glEnable(GL11.GL_BLEND);
+			GlUtil.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			GlUtil.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
+			ShaderLibrary.shardShader.setShaderInterface(this);
+			ShaderLibrary.shardShader.load();
+			frameMesh.draw();
+			ShaderLibrary.shardShader.unload();
+
+			for(int i = 0; i < 12; i++) {
+				if(modulesMeshes[i] != null && modules[i] != null) {
+					if(modules[i].getStatus() != StructureModuleData.NONE) {
+						ShaderLibrary.scanlineShader.setShaderInterface(this);
+						ShaderLibrary.scanlineShader.load();
+					} else {
+						ShaderLibrary.shardShader.setShaderInterface(this);
+						ShaderLibrary.shardShader.load();
+					}
+					modulesMeshes[i].draw();
+					if(modules[i].getStatus() != StructureModuleData.NONE) ShaderLibrary.scanlineShader.unload();
+					else ShaderLibrary.shardShader.unload();
+				}
+			}
+
+			GlUtil.glDisable(GL11.GL_BLEND);
+		} catch(Exception exception) {
+			exception.printStackTrace();
+		}
 	}
 
 	@Override
 	public void cleanUp() {
-		if(mesh != null) mesh.cleanUp();
+		if(frameMesh != null) frameMesh.cleanUp();
+		for(Mesh mesh : modulesMeshes) if(mesh != null) mesh.cleanUp();
 	}
 
 	@Override
@@ -131,9 +170,8 @@ public class DysonSphereData extends SuperStructureData {
 
 	public SunType getSunType() {
 		try {
-			if((GameCommon.isDedicatedServer() || GameCommon.isOnSinglePlayer()) && GameServer.getServerState() != null) return SunType.getFromSystem(GameServer.getServerState().getUniverse().getGalaxyFromSystemPos(system), system);
-			else if(GameClient.getClientState() != null) return SunType.getFromSystem(GameClient.getClientState().getCurrentGalaxy(), system); //Todo: Probably want to get a specific galaxy rather than just the current one.
-			else return SunType.VOID;
+			if(segmentController.isOnServer()) return SunType.getFromSystem(GameServer.getServerState().getUniverse().getGalaxyFromSystemPos(system), system);
+			else return SunType.getFromSystem(GameClient.getClientState().getCurrentGalaxy(), system); //Todo: Probably want to get a specific galaxy rather than just the current one.
 		} catch(Exception exception) {
 			exception.printStackTrace();
 			return SunType.VOID;

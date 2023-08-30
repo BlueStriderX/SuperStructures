@@ -2,7 +2,9 @@ package thederpgamer.superstructures.elements.blocks.systems;
 
 import api.config.BlockConfig;
 import org.schema.game.common.data.element.ElementKeyMap;
+import org.schema.schine.graphicsengine.core.GraphicsContext;
 import thederpgamer.superstructures.elements.blocks.Block;
+import thederpgamer.superstructures.manager.ResourceManager;
 
 /**
  * <Description>
@@ -13,7 +15,7 @@ import thederpgamer.superstructures.elements.blocks.Block;
 public class DysonSphereController extends Block {
 
     public DysonSphereController() {
-        super("Dyson Sphere Controller", ElementKeyMap.getInfo(ElementKeyMap.LIFT_ELEMENT).getType());
+        super("Dyson Sphere Controller", BlockConfig.newElementCategory(ElementKeyMap.getInfo(ElementKeyMap.LIFT_ELEMENT).getType(), "Superstellar Construction"));
     }
 
     @Override

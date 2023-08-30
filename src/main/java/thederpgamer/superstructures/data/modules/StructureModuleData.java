@@ -2,11 +2,11 @@ package thederpgamer.superstructures.data.modules;
 
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
+import it.unimi.dsi.fastutil.shorts.Short2IntOpenHashMap;
 import thederpgamer.superstructures.data.DataSerializer;
 import thederpgamer.superstructures.data.structures.SuperStructureData;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 /**
  * <Description>
@@ -27,7 +27,7 @@ public class StructureModuleData implements DataSerializer {
     private int level;
     private int maxLevel;
     private int status;
-    private HashMap<Short, Integer> constructionMap;
+    private final Short2IntOpenHashMap constructionMap = new Short2IntOpenHashMap();
 
     public StructureModuleData(SuperStructureData structureData, String name, String description, int maxLevel) {
         this.structureData = structureData;
@@ -35,11 +35,10 @@ public class StructureModuleData implements DataSerializer {
         this.description = description;
         this.maxLevel = maxLevel;
         level = 0;
-        constructionMap = new HashMap<>();
         status = NONE;
     }
 
-    public StructureModuleData(PacketReadBuffer packetReadBuffer) throws IOException {
+	public StructureModuleData(PacketReadBuffer packetReadBuffer) throws IOException {
         deserialize(packetReadBuffer);
     }
 
@@ -54,7 +53,11 @@ public class StructureModuleData implements DataSerializer {
         packetWriteBuffer.writeInt(level);
         packetWriteBuffer.writeInt(maxLevel);
         packetWriteBuffer.writeInt(status);
-        packetWriteBuffer.writeObject(constructionMap);
+        packetWriteBuffer.writeInt(constructionMap.size());
+        for(Short key : constructionMap.keySet()) {
+            packetWriteBuffer.writeShort(key);
+            packetWriteBuffer.writeInt(constructionMap.get(key));
+        }
     }
 
     @Override
@@ -64,7 +67,8 @@ public class StructureModuleData implements DataSerializer {
         level = packetReadBuffer.readInt();
         maxLevel = packetReadBuffer.readInt();
         status = packetReadBuffer.readInt();
-        constructionMap = packetReadBuffer.readObject(constructionMap.getClass());
+        int size = packetReadBuffer.readInt();
+        for(int i = 0; i < size; i ++) constructionMap.put(packetReadBuffer.readShort(), packetReadBuffer.readInt());
     }
 
     public SuperStructureData getStructureData() {
@@ -99,7 +103,7 @@ public class StructureModuleData implements DataSerializer {
         this.status = status;
     }
 
-    public HashMap<Short, Integer> getConstructionMap() {
+    public Short2IntOpenHashMap getConstructionMap() {
         return constructionMap;
     }
 }

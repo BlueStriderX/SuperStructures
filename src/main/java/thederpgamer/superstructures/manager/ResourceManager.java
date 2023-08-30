@@ -41,18 +41,18 @@ public class ResourceManager {
 
 	private static final String[] meshNames = {
 			"dyson_sphere_frame",
-			"dyson_sphere_empty_module_0",
-			"dyson_sphere_empty_module_1",
-			"dyson_sphere_empty_module_2",
-			"dyson_sphere_empty_module_3",
-			"dyson_sphere_empty_module_4",
-			"dyson_sphere_empty_module_5",
-			"dyson_sphere_empty_module_6",
-			"dyson_sphere_empty_module_7",
-			"dyson_sphere_empty_module_8",
-			"dyson_sphere_empty_module_9",
-			"dyson_sphere_empty_module_10",
-			"dyson_sphere_empty_module_11"
+			"dyson_sphere_empty_module_0"
+//			"dyson_sphere_empty_module_1",
+//			"dyson_sphere_empty_module_2",
+//			"dyson_sphere_empty_module_3",
+//			"dyson_sphere_empty_module_4",
+//			"dyson_sphere_empty_module_5",
+//			"dyson_sphere_empty_module_6",
+//			"dyson_sphere_empty_module_7",
+//			"dyson_sphere_empty_module_8",
+//			"dyson_sphere_empty_module_9",
+//			"dyson_sphere_empty_module_10",
+//			"dyson_sphere_empty_module_11"
 			/*
 			"dyson_sphere_power_module",
 			"dyson_sphere_resource_module",
@@ -77,9 +77,9 @@ public class ResourceManager {
 				for(String textureName : textureNames) {
 					try {
 						if(textureName.endsWith("icon")) {
-							textureMap.put(textureName, StarLoaderTexture.newIconTexture(instance.getJarBufferedImage("/textures/" + textureName + ".png")));
+							textureMap.put(textureName, StarLoaderTexture.newIconTexture(instance.getJarBufferedImage("textures/" + textureName + ".png")));
 						} else {
-							textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("/textures/" + textureName + ".png")));
+							textureMap.put(textureName, StarLoaderTexture.newBlockTexture(instance.getJarBufferedImage("textures/" + textureName + ".png")));
 						}
 					} catch(Exception exception) {
 						//LogManager.logException("Failed to load texture \"" + textureName + "\"", exception);
@@ -89,7 +89,7 @@ public class ResourceManager {
 				//Load Sprites
 				for(String spriteName : spriteNames) {
 					try {
-						Sprite sprite = StarLoaderTexture.newSprite(instance.getJarBufferedImage("/sprites/" + spriteName + ".png"), instance, spriteName);
+						Sprite sprite = StarLoaderTexture.newSprite(instance.getJarBufferedImage("sprites/" + spriteName + ".png"), instance, spriteName);
 						sprite.setPositionCenter(false);
 						sprite.setName(spriteName);
 						spriteMap.put(spriteName, sprite);
@@ -101,7 +101,7 @@ public class ResourceManager {
 				//Load meshes
 				for(String meshName : meshNames) {
 					try {
-						loader.getMeshLoader().loadModMesh(instance, meshName, instance.getJarResource("/meshes/" + meshName + ".zip"), null);
+						loader.getMeshLoader().loadModMesh(instance, meshName, instance.getJarResource("meshes/" + meshName + ".zip"), null);
 						Mesh mesh = loader.getMeshLoader().getModMesh(SuperStructures.getInstance(), meshName);
 						mesh.setFirstDraw(true);
 						meshMap.put(meshName, mesh);

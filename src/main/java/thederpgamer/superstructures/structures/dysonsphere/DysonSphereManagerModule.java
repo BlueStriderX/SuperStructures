@@ -1,7 +1,5 @@
 package thederpgamer.superstructures.structures.dysonsphere;
 
-import api.common.GameClient;
-import api.common.GameCommon;
 import api.network.PacketReadBuffer;
 import api.network.PacketWriteBuffer;
 import api.utils.game.module.ModManagerContainerModule;
@@ -30,19 +28,21 @@ public class DysonSphereManagerModule extends ModManagerContainerModule {
 	private DysonSphereData structureData;
 
 	public DysonSphereManagerModule(SegmentController segmentController, ManagerContainer<?> managerContainer) {
-		super(segmentController, managerContainer, SuperStructures.getInstance(), ElementManager.getBlock("Dyson Sphere Controller").getId());
+		super(segmentController, managerContainer, SuperStructures.getInstance(), Objects.requireNonNull(ElementManager.getBlock("Dyson Sphere Controller")).getId());
 	}
 
 	@Override
 	public void handle(Timer timer) {
-		if(!SuperStructureDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex()) && StructureUtils.inDrawRange(Objects.requireNonNull(StructureType.getType(structureData.segmentPiece.getType())))) GraphicsManager.getInstance().superStructureDrawer.addDrawData(structureData);
-		else if(SuperStructureDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex())) GraphicsManager.getInstance().superStructureDrawer.removeDrawData(structureData.segmentPiece.getAbsoluteIndex());
-		if((GameCommon.isOnSinglePlayer() || GameCommon.isClientConnectedToServer()) && GameClient.getClientState() != null) GraphicsManager.getInstance().superStructureDrawer.draw();
+		if(!isValid()) return;
+		if(!segmentController.isOnServer()) {
+			if(!SuperStructureDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex()) && StructureUtils.inDrawRange(Objects.requireNonNull(StructureType.getType(structureData.segmentPiece.getType())))) GraphicsManager.getInstance().superStructureDrawer.addDrawData(structureData);
+			else if(SuperStructureDrawer.drawMap.containsKey(structureData.segmentPiece.getAbsoluteIndex())) GraphicsManager.getInstance().superStructureDrawer.removeDrawData(structureData.segmentPiece.getAbsoluteIndex());
+		}
 	}
 
 	@Override
 	public void onTagSerialize(PacketWriteBuffer packetWriteBuffer) throws IOException {
-		if(structureData != null) structureData.serialize(packetWriteBuffer);
+		if(isValid()) structureData.serialize(packetWriteBuffer);
 	}
 
 	@Override
@@ -66,15 +66,13 @@ public class DysonSphereManagerModule extends ModManagerContainerModule {
 	}
 
 	@Override
-	public void handlePlace(long absIndex, byte orientation) {
-		super.handlePlace(absIndex, orientation);
-		structureData = StructureUtils.generateStructureData(segmentController.getSegmentBuffer().getPointUnsave(absIndex));
-	}
-
-	@Override
 	public void handleRemove(long absIndex) {
 		super.handleRemove(absIndex);
 		structureData = null;
+	}
+
+	public boolean isValid() {
+		return structureData != null && structureData.segmentPiece != null;
 	}
 
 	public DysonSphereData getStructureData() {

@@ -19,7 +19,7 @@ import thederpgamer.superstructures.utils.StructureUtils;
  */
 public class EventManager {
 
-	public static void initialize(final SuperStructures instance) {
+	public static void initialize(SuperStructures instance) {
 		StarLoader.registerListener(RegisterWorldDrawersEvent.class, new Listener<RegisterWorldDrawersEvent>() {
 			@Override
 			public void onEvent(RegisterWorldDrawersEvent event) {
@@ -39,19 +39,8 @@ public class EventManager {
 			public void onEvent(SegmentPieceActivateByPlayer event) {
 				assert event.isServer();
 				SegmentPiece segmentPiece = event.getSegmentPiece();
-				if(StructureUtils.isValid(segmentPiece) || PlayerUtils.adminMode(event.getPlayer())) {
-					StructureUtils.openGUI(segmentPiece, event.getPlayer());
-				}
-				/*
-				if(segmentPiece.getInfo().getId() == ElementManager.getBlock("Dyson Sphere Controller").getId()) {
-					if(StructureUtils.isValid(segmentPiece) || PlayerUtils.adminMode(event.getPlayer())) {
-						GraphicsManager guiManager = GraphicsManager.getInstance();
-						if(guiManager.dysonSphereControlManager == null) {
-								}
-
-					} else
-				}
-				 */
+				if(StructureUtils.isValid(segmentPiece) || PlayerUtils.adminMode(event.getPlayer())) StructureUtils.openGUI(segmentPiece, event.getPlayer());
+				else event.getPlayer().sendServerMessagePlayerError(new Object[] {"Structure is invalid! Check placement and station location!"});
 			}
 		}, instance);
 	}

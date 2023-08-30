@@ -5,6 +5,7 @@ import api.utils.gui.ModGUIHandler;
 import org.schema.game.common.data.SegmentPiece;
 import org.schema.game.common.data.player.PlayerState;
 import thederpgamer.superstructures.SuperStructures;
+import thederpgamer.superstructures.data.structures.DysonSphereData;
 import thederpgamer.superstructures.graphics.drawer.SuperStructureDrawer;
 import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereControlManager;
 import thederpgamer.superstructures.graphics.gui.dysonsphere.DysonSphereMenuPanel;
@@ -39,9 +40,10 @@ public class GraphicsManager {
 				dysonSphereControlManager = new DysonSphereControlManager();
 				ModGUIHandler.registerNewControlManager(SuperStructures.getInstance().getSkeleton(), dysonSphereControlManager);;
 			}
-			dysonSphereControlManager.structureData = ((DysonSphereManagerModule) Objects.requireNonNull(EntityUtils.getManagerContainer(segmentPiece.getSegmentController())).getModMCModule(segmentPiece.getType())).getStructureData();
+			DysonSphereData structureData = ((DysonSphereManagerModule) Objects.requireNonNull(EntityUtils.getManagerContainer(segmentPiece.getSegmentController())).getModMCModule(segmentPiece.getType())).getStructureData();
+			dysonSphereControlManager.structureData = structureData;
 			dysonSphereControlManager.onInit();
-			((DysonSphereMenuPanel) dysonSphereControlManager.getMenuPanel()).structureData = dysonSphereControlManager.structureData;
+			((DysonSphereMenuPanel) dysonSphereControlManager.getMenuPanel()).structureData = structureData;
 			dysonSphereControlManager.setActive(true);
 		} else NetworkManager.sendOpenGUIPacket(segmentPiece, playerState);
 	}
